@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:flutter/services.dart';
 import 'package:location/location.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -18,27 +19,35 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   late GoogleMapController mapController;
   late LatLng googleMapsCenter;
   late Marker marker;
-  Location location = Location();
-
   late LocationData _currentPosition;
-  late String _adress, _dateTime;
-
+  final Completer<GoogleMapController> _cntr = Completer();
+  Location location = Location();
   LatLng _initialcameraposition = LatLng(45.760696, 21.226788);
+  String mapTheme = '';
 
   @override
   void initState(){
     super.initState();
     getLoc();
+    DefaultAssetBundle.of(context).loadString('assets/maptheme/silver.json').then((string) {
+      mapTheme = string;
+      print(mapTheme);
+    }).catchError((error) {
+      print('here');
+      log(error.toString());
+    });
   }
 
   void _onMapCreated(GoogleMapController controller) {
 
-    mapController = mapController;
+    mapController = controller;
+    mapController.setMapStyle(mapTheme);
+    _cntr.complete(mapController);
     location.onLocationChanged.listen((event) {
       mapController.animateCamera(
           CameraUpdate.newCameraPosition(
           CameraPosition(target:
-          LatLng(event.latitude!,event.longitude!),zoom: 10),
+          LatLng(event.latitude!,event.longitude!),zoom: 15),
           ),
       );
     });
@@ -50,13 +59,69 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       key: scaffoldKey,
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFFEFEFEF),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton.large(
+        onPressed:(){},
+        backgroundColor: Colors.indigoAccent,
+        child: Icon(Icons.photo_camera),
+        ),
       body:GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(target: _initialcameraposition, zoom: 10),
-        mapType: MapType.normal,
+        onMapCreated:_onMapCreated,
+        initialCameraPosition: CameraPosition(target: _initialcameraposition, zoom: 15),
         myLocationEnabled: true,
-
+        zoomControlsEnabled: true,
       ),
+      bottomNavigationBar: BottomAppBar(
+        notchMargin: 3.0,
+        shape: const CircularNotchedRectangle(),
+        color: Colors.indigoAccent,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
+              padding:const EdgeInsets.only(left: 0.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      print("emergency contacts pressed");
+                    },
+                    icon: const Icon(Icons.phone),
+                  ),
+                  const Text(
+                    "Emergency",
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding:const EdgeInsets.only(left: 10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                verticalDirection: VerticalDirection.down,
+                children: [
+                  IconButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      print("mark place pressed");
+                    },
+                    icon: const Icon(Icons.pin_drop_sharp),
+                  ),
+                  const Text(
+                    "Mark",
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+
     );
   }
 
@@ -83,11 +148,9 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     _currentPosition = await location.getLocation();
     _initialcameraposition = LatLng(_currentPosition.latitude!,_currentPosition.longitude!);
     location.onLocationChanged.listen((LocationData currentLocation) {
-      print("${currentLocation.longitude} : ${currentLocation.longitude}");
       setState(() {
         _currentPosition = currentLocation;
         _initialcameraposition = LatLng(_currentPosition.latitude!,_currentPosition.longitude!);
-
           });
         });
   }
