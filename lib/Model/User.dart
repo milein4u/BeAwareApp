@@ -1,20 +1,17 @@
 class Users {
-  String? firstName;
-  String? lastName;
-  int? age;
+  String? email;
+  String? phone;
 
   Users();
 
   Users.fromSnapshot(snapshot)
-      : firstName = snapshot.data()['first name'],
-        lastName = snapshot.data()['last name'],
-        age = snapshot.data()['age'];
+      : email = snapshot.data()['email'],
+        phone = snapshot.data()['phone'];
 
   Map<String, dynamic> toFirestore() {
     return {
-      if (firstName != null) "first name": firstName,
-      if (lastName != null) "last name": lastName,
-      if (age != null) "age": age,
+      if (email != null) "email": email,
+      if (phone != null) "last name": phone,
     };
   }
 

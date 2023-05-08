@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:woman_safety_app/Pages/LoginPage/ForgottenPassword.dart';
 
 import '../MapHomePage.dart';
 import '../StartPage.dart';
@@ -65,10 +66,8 @@ class _LoginWidgetState extends State<LoginWidget> {
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
         errorMessage("Incorrect credentials!") ?? false;
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
       }
     }
   }
@@ -127,20 +126,14 @@ class _LoginWidgetState extends State<LoginWidget> {
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    FlutterFlowIconButton(
-                      borderColor: Colors.transparent,
-                      borderRadius: 30,
-                      borderWidth: 1,
-                      buttonSize: 50,
-                      icon: Icon(
-                        Icons.arrow_back_rounded,
-                        color: FlutterFlowTheme.of(context).primaryText,
-                        size: 24,
-                      ),
-                      onPressed: () =>{ Navigator.of(context).push(_createRoute())
+                    IconButton(
+                      color: Colors.black,
+                      icon: Icon(Icons.arrow_back),
+                      iconSize: 38,
+                      onPressed: () {
+                        Navigator.of(context).pop();
                       },
                     ),
-
                   ],
                 ),
               ),
@@ -349,10 +342,12 @@ class _LoginWidgetState extends State<LoginWidget> {
             ),
           ),
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(30, 44, 9, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(30, 44, 9, 0),
             child: FFButtonWidget(
               onPressed: () {
-                print('Button-Login pressed ...');
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ForgottenPasswordWidget();
+                }));
               },
               text: 'Forgot Password?',
               options: FFButtonOptions(
@@ -364,7 +359,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   color: FlutterFlowTheme.of(context).secondaryText,
                 ),
                 elevation: 0,
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.transparent,
                   width: 1,
                 ),

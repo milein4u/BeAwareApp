@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
-
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +24,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   late Marker marker;
   late LocationData _currentPosition;
   final Completer<GoogleMapController> _cntr = Completer();
+  Set<Marker> _markers = {};
   Location location = Location();
   LatLng _initialcameraposition = LatLng(45.760696, 21.226788);
   String mapTheme = '';
@@ -28,6 +32,24 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   @override
   void initState(){
     super.initState();
+    FirebaseFirestore.instance.collection('markers').snapshots().listen((snapshot) async {
+      // Clear the current markers.
+      setState(() {
+        _markers.clear();
+      });
+
+      // Add a new marker for each document in the collection.
+      for (var doc in snapshot.docs) {
+        Marker newMarker = Marker(
+          markerId: MarkerId(doc.id),
+          position: LatLng(doc['lat'], doc['lng']),
+          icon: BitmapDescriptor.fromBytes(await getBytesFromAsset('assets/markers/custom_marker_blue.png', 48)),
+        );
+        setState(() {
+          _markers.add(newMarker);
+        });
+      }
+    });
     getLoc();
     DefaultAssetBundle.of(context).loadString('assets/maptheme/silver.json').then((string) {
       mapTheme = string;
@@ -36,6 +58,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       print('here');
       log(error.toString());
     });
+
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -53,6 +76,36 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     });
   }
 
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+
+  }
+
+  void _addMarker(LatLng latLng) async{
+
+    Marker newMarker = Marker(
+      markerId: MarkerId(DateTime.now().toString()),
+      position: latLng,
+      icon: BitmapDescriptor.fromBytes(await getBytesFromAsset('assets/markers/custom_marker_blue.png', 48)),
+    );
+
+    // Add the new marker to the set.
+    setState(() {
+      _markers.add(newMarker);
+    });
+
+    // Add the new marker to Firestore.
+    await FirebaseFirestore.instance.collection('markers').add({
+      'lat': latLng.latitude,
+      'lng': latLng.longitude,
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,11 +115,18 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.large(
         onPressed:(){},
-        backgroundColor: Colors.indigoAccent,
-        child: Icon(Icons.photo_camera),
+        backgroundColor: Colors.redAccent,
+        child: IconButton(
+        color: Colors.white,
+        onPressed: () {
+          print("sos pressed");
+        },
+        icon: const Icon(Icons.sos),
+      ),
         ),
       body:GoogleMap(
         onMapCreated:_onMapCreated,
+        onTap: _addMarker,
         initialCameraPosition: CameraPosition(target: _initialcameraposition, zoom: 15),
         myLocationEnabled: true,
         zoomControlsEnabled: true,
@@ -80,7 +140,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Padding(
-              padding:const EdgeInsets.only(left: 0.0),
+              padding:const EdgeInsets.only(right: 130.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -92,14 +152,14 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                     icon: const Icon(Icons.phone),
                   ),
                   const Text(
-                    "Emergency",
+                    "Emergency contacts",
                     style: TextStyle(color: Colors.white),
                   )
                 ],
               ),
             ),
             Padding(
-              padding:const EdgeInsets.only(left: 10.0),
+              padding:const EdgeInsets.only(right: 20.0, left: 10.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 verticalDirection: VerticalDirection.down,
@@ -112,7 +172,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                     icon: const Icon(Icons.pin_drop_sharp),
                   ),
                   const Text(
-                    "Mark",
+                    "Mark history",
                     style: TextStyle(color: Colors.white),
                   )
                 ],

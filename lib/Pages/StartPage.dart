@@ -39,7 +39,7 @@ class _StartPageWidgetState extends State<StartPageWidget> {
         },
       );
     }
-    else if (type == "register") {
+    else if (type == "registerEmail") {
       return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             SignupWidget(),
@@ -338,7 +338,7 @@ class _StartPageWidgetState extends State<StartPageWidget> {
                   padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 24),
                   child: FFButtonWidget(
                     onPressed: () {
-                      Navigator.of(context).push(_createRoute("register"));
+                      Navigator.of(context).push(_createRoute("registerEmail"));
                     },
                     text: 'Register',
                     options: FFButtonOptions(

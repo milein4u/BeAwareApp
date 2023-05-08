@@ -35,19 +35,19 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
 
-      // home:  StreamBuilder(
-      //     stream: FirebaseAuth.instance.authStateChanges(),
-      //     builder: (ctx, userSnapshot) {
-      //       if (userSnapshot.connectionState == ConnectionState.waiting) {
-      //         return const StartPageWidget();
-      //       }
-      //       if (userSnapshot.hasData) {
-      //         return const StartPageWidget();
-      //       }
-      //       return const StartPageWidget();
-      //     }
-      // ),
-      home:   MapHomePageWidget(),
+      home:  StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, userSnapshot) {
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
+              return const StartPageWidget();
+            }
+            if (userSnapshot.hasData) {
+              return const StartPageWidget();
+            }
+            return const StartPageWidget();
+          }
+      ),
+
 
       routes: {
         'start_page': (context) => StartPageWidget(),
