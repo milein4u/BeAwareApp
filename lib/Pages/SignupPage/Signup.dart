@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../StartPage.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
@@ -29,9 +30,7 @@ class _SignupWidgetState extends State<SignupWidget> {
   late bool confirmPasswordVisibility;
   final TextEditingController emailAddressController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
   TextEditingController? confirmPasswordController;
   late bool passwordVisibility;
@@ -53,16 +52,37 @@ class _SignupWidgetState extends State<SignupWidget> {
   @override
   void dispose() {
     confirmPasswordController?.dispose();
-    emailAddressController?.dispose();
-    passwordController?.dispose();
+    emailAddressController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  void addUser()
-  {
-    _user.firstName = firstNameController.text.trim();
-    _user.lastName = lastNameController.text.trim();
-    _user.age = int.parse(ageController.text);
+  void addUser(){
+
+    _user.email = emailAddressController.text.trim();
+    _user.phone = phoneController.text.trim();
+
+  }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          StartPageWidget(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(
+            CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
   }
 
   void getCurrentUser() async {
@@ -119,9 +139,33 @@ class _SignupWidgetState extends State<SignupWidget> {
       return true;
   }
 
+  bool isValidPhoneNumber(String phone) {
+    String pattern = r'^(?:\+40|0)[ ]?7\d{2}[ ]?\d{3}[ ]?\d{3}$';
+    RegExp regExp = new RegExp(pattern);
+    return regExp.hasMatch(phone);
+  }
+
+  bool phoneConfirmed()
+  {
+    if(phoneController.text.isEmpty)
+    {
+      errorMessage("Please write your phone number!");
+      return false;
+    }
+    if(isValidPhoneNumber(phoneController.text) == false)
+    {
+      errorMessage("Please write a valid phone number!");
+      return false;
+    }
+    else
+      return true;
+  }
+
   Future addUserDetails(String uid) async {
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'uid' : uid,
+        'email': emailAddressController.text.trim(),
+        'phone': phoneController.text.trim()
     });
   }
 
@@ -144,7 +188,7 @@ class _SignupWidgetState extends State<SignupWidget> {
   }
 
   Future signUp() async {
-    if (emailConfirmed() && confirmedPassword()) {
+    if (emailConfirmed() && confirmedPassword() && phoneConfirmed()) {
       try {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
@@ -190,6 +234,39 @@ class _SignupWidgetState extends State<SignupWidget> {
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+      appBar: PreferredSize(
+      preferredSize: Size.fromHeight(100),
+      child: AppBar(
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        automaticallyImplyLeading: false,
+        title: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  IconButton(
+                    color: Colors.black,
+                    icon: Icon(Icons.arrow_back),
+                    iconSize: 38,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [],
+        centerTitle: true,
+        elevation: 0,
+      ),
+      ),
       body: GestureDetector(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -259,6 +336,67 @@ class _SignupWidgetState extends State<SignupWidget> {
                                     labelStyle:
                                     FlutterFlowTheme.of(context).subtitle2,
                                     hintText: 'Enter your email here...',
+                                    hintStyle:
+                                    FlutterFlowTheme.of(context).bodyText2,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryBackground,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryBackground,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0x00000000),
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0x00000000),
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    filled: true,
+                                    fillColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    contentPadding:
+                                    EdgeInsetsDirectional.fromSTEB(
+                                        16, 24, 0, 24),
+                                  ),
+                                  style: FlutterFlowTheme.of(context).subtitle1,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding:
+                          EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: phoneController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Phone number',
+                                    labelStyle:
+                                    FlutterFlowTheme.of(context).subtitle2,
+                                    hintText: 'Enter your phone number...',
                                     hintStyle:
                                     FlutterFlowTheme.of(context).bodyText2,
                                     enabledBorder: OutlineInputBorder(
@@ -470,7 +608,6 @@ class _SignupWidgetState extends State<SignupWidget> {
                             children: [
                               FFButtonWidget(
                                 onPressed: () {signUp();
-                                  addUser();
                                   addUserDetails(currentUser.uid);
                                 },
                                 text: 'Create Account',
@@ -503,33 +640,6 @@ class _SignupWidgetState extends State<SignupWidget> {
                           indent: 20,
                           endIndent: 20,
                           color: FlutterFlowTheme.of(context).lineColor,
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 44),
-                          child: FFButtonWidget(
-                            onPressed: () {
-                              print('ButtonCreateAccount pressed ...');
-                            },
-                            text: 'Log In',
-                            options: FFButtonOptions(
-                              width: 170,
-                              height: 40,
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .subtitle2
-                                  .override(
-                                fontFamily: 'Poppins',
-                                color: FlutterFlowTheme.of(context)
-                                    .primaryColor,
-                              ),
-                              elevation: 0,
-                              borderSide: BorderSide(
-                                color: Colors.transparent,
-                                width: 1,
-                              ),
-                            ),
-                          ),
                         ),
                       ],
                     ),

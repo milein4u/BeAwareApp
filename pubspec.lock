@@ -193,6 +193,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  floatingpanel:
+    dependency: "direct main"
+    description:
+      name: floatingpanel
+      sha256: "1c22f3b5b6e84641d56d11d48136601d489a21eabb2c2e10d3d5f19f3d962468"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -262,6 +270,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  flutter_speed_dial:
+    dependency: "direct main"
+    description:
+      name: flutter_speed_dial
+      sha256: ed3d1d7c5a20d51fddc68a64d7f2816394370c29e63979dd488da0e0a9d4fa25
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.3.0"
   flutter_svg:
     dependency: "direct main"
     description:
