@@ -58,33 +58,6 @@ class _SignupWidgetState extends State<SignupWidget> {
     super.dispose();
   }
 
-  void addUser(){
-
-    _user.email = emailAddressController.text.trim();
-    _user.phone = phoneController.text.trim();
-
-  }
-
-  Route _createRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          StartPageWidget(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = Curves.ease;
-
-        var tween = Tween(begin: begin, end: end).chain(
-            CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
-
   void getCurrentUser() async {
     try {
       final user = _auth.currentUser;

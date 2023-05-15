@@ -9,6 +9,8 @@ import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'EmergencyContactsPage.dart';
+
 class MapHomePageWidget extends StatefulWidget {
   const MapHomePageWidget({Key? key}) : super(key: key);
 
@@ -119,7 +121,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         child: IconButton(
         color: Colors.white,
         onPressed: () {
-          print("sos pressed");
+          print("add pressed");
         },
         icon: const Icon(Icons.sos),
       ),
@@ -147,7 +149,9 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                   IconButton(
                     color: Colors.white,
                     onPressed: () {
-                      print("emergency contacts pressed");
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return EmergencyContactsPageWidget();
+                      }));
                     },
                     icon: const Icon(Icons.phone),
                   ),
