@@ -15,6 +15,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
+
+
 import '../../Model/User.dart';
 
 
@@ -134,11 +138,19 @@ class _SignupWidgetState extends State<SignupWidget> {
       return true;
   }
 
+  String hashPassword(String password) {
+    List<int> bytes = utf8.encode(password); // Convert the password to bytes
+    Digest sha256Result = sha256.convert(bytes); // Hash the bytes using SHA-256
+    String hashedPassword = sha256Result.toString();// Convert the hashed result to a string
+    return hashedPassword;
+  }
+
   Future addUserDetails(String uid) async {
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'uid' : uid,
         'email': emailAddressController.text.trim(),
-        'phone': phoneController.text.trim()
+        'phone': phoneController.text.trim(),
+        'password': hashPassword(passwordController.text)
     });
   }
 
@@ -160,11 +172,10 @@ class _SignupWidgetState extends State<SignupWidget> {
     }
   }
 
-  Future signUp() async {
+  Future register() async {
     if (emailConfirmed() && confirmedPassword() && phoneConfirmed()) {
       try {
-        await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: emailAddressController.text.trim(), password: passwordController.text.trim());
         getCurrentUser();
         addUserDetails(currentUser.uid.toString());
@@ -175,31 +186,28 @@ class _SignupWidgetState extends State<SignupWidget> {
             content: Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
-                  'Sucessfully Register.You Can Login Now'),
+                  'Successfully Register.You Can Login Now'),
             ),
             duration: Duration(seconds: 5),
           ),
         );
 
-        Navigator.pushReplacementNamed(context, 'address_screen');
+        Navigator.pushReplacementNamed(context, 'start_page');
 
         setState(() {
           isloading = false;
         });
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          log('The password provided is too weak.');
-          errorMessage('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          log('The account already exists for that email.');
-          errorMessage('The account already exists for that email.');
-        }
-        else {
-          errorMessage("Oops, registration failed!");
-
-        }
+          } on FirebaseAuthException catch(e){
+            print(e);
+            showDialog(
+                context: context,
+                builder: (context){
+                  return AlertDialog(
+                  content: Text(e.message.toString()),
+                  );
+                });
+          }
       }
-    }
   }
 
   @override
@@ -580,15 +588,12 @@ class _SignupWidgetState extends State<SignupWidget> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               FFButtonWidget(
-                                onPressed: () {signUp();
-                                  addUserDetails(currentUser.uid);
-                                },
+                                onPressed: () { register();},
                                 text: 'Create Account',
                                 options: FFButtonOptions(
                                   width: 180,
                                   height: 50,
-                                  color:
-                                  FlutterFlowTheme.of(context).primaryColor,
+                                  color: Colors.black,
                                   textStyle: FlutterFlowTheme.of(context)
                                       .subtitle2
                                       .override(

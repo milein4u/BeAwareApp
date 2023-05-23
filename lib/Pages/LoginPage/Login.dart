@@ -68,6 +68,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       if (e.code == 'user-not-found') {
         errorMessage("Incorrect credentials!") ?? false;
       } else if (e.code == 'wrong-password') {
+        errorMessage("Incorrect credentials!") ?? false;
       }
     }
   }
