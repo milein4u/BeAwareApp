@@ -4,12 +4,14 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:sms/sms.dart';
 import 'EmergencyContactsPage.dart';
+import 'MarkHistoryPage.dart';
 
 class MapHomePageWidget extends StatefulWidget {
   const MapHomePageWidget({Key? key}) : super(key: key);
@@ -20,39 +22,25 @@ class MapHomePageWidget extends StatefulWidget {
 
 class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  late Timer logoutTimer;
   late GoogleMapController mapController;
   late LatLng googleMapsCenter;
   late Marker marker;
   late LocationData _currentPosition;
   late LocationData _liveLocation;
   final Completer<GoogleMapController> _cntr = Completer();
-  Set<Marker> _markers = {};
+  List<Marker> _markersList =[];
   Location location = Location();
   LatLng _initialcameraposition = LatLng(45.760696, 21.226788);
   String mapTheme = '';
+  final markersSnapshot = FirebaseFirestore.instance.collection('markers').get();
 
   @override
   void initState(){
     super.initState();
-    FirebaseFirestore.instance.collection('markers').snapshots().listen((snapshot) async {
-      // Clear the current markers.
-      setState(() {
-        _markers.clear();
-      });
-
-      // Add a new marker for each document in the collection.
-      for (var doc in snapshot.docs) {
-        Marker newMarker = Marker(
-          markerId: MarkerId(doc.id),
-          position: LatLng(doc['lat'], doc['lng']),
-          icon: BitmapDescriptor.fromBytes(await getBytesFromAsset('assets/markers/custom_marker_blue.png', 48)),
-        );
-        setState(() {
-          _markers.add(newMarker);
-        });
-      }
-    });
+    logoutTimer = Timer(Duration.zero, handleLogout);
+    logoutTimerStart();
+    fetchMarkersFromFirestore();
     getLoc();
     DefaultAssetBundle.of(context).loadString('assets/maptheme/silver.json').then((string) {
       mapTheme = string;
@@ -64,6 +52,51 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
 
   }
 
+  Future logoutTimerStart() async{
+    const inactivityDuration = Duration(hours: 72);
+
+    if (logoutTimer != null) {
+      logoutTimer.cancel();
+    }
+
+    logoutTimer = Timer(inactivityDuration, handleLogout);
+
+  }
+
+  void resetLogoutTimer() {
+    if(logoutTimer!=null) {
+      logoutTimer.cancel();
+    }
+    logoutTimerStart();
+  }
+
+  void handleLogout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.pushReplacementNamed(context, 'start_page');
+    } catch (e) {
+      print('Error during logout: $e');
+    }
+  }
+
+  Future<void> fetchMarkersFromFirestore() async {
+    final markersSnapshot =
+    await FirebaseFirestore.instance.collection('markers').get();
+
+    setState(() {
+      _markersList = markersSnapshot.docs.map((doc) {
+        final markerData = doc.data();
+        final LatLng position =
+        LatLng(markerData['latitude'], markerData['longitude']);
+
+        return Marker(
+          markerId: MarkerId(doc.id),
+          position: position,
+        );
+      }).toList();
+    });
+  }
+
   void _onMapCreated(GoogleMapController controller) {
 
     mapController = controller;
@@ -73,7 +106,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       mapController.animateCamera(
           CameraUpdate.newCameraPosition(
           CameraPosition(target:
-          LatLng(event.latitude!,event.longitude!),zoom: 15),
+          LatLng(event.latitude!,event.longitude!),zoom: 20),
           ),
       );
     });
@@ -88,30 +121,42 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
 
   }
 
-  void _addMarker(LatLng latLng) async{
-
-    Marker newMarker = Marker(
-      markerId: MarkerId(DateTime.now().toString()),
-      position: latLng,
-      icon: BitmapDescriptor.fromBytes(await getBytesFromAsset('assets/markers/custom_marker_blue.png', 48)),
+  void addMarker(LatLng position) async{
+    final newMarker = Marker(
+      markerId: MarkerId(position.toString()),
+      position: position,
     );
 
-    // Add the new marker to the set.
     setState(() {
-      _markers.add(newMarker);
+      _markersList.add(newMarker);
     });
 
-    // Add the new marker to Firestore.
-    await FirebaseFirestore.instance.collection('markers').add({
-      'lat': latLng.latitude,
-      'lng': latLng.longitude,
-    });
+    // Save marker data to Firestore
+    await saveMarkerToFirestore(newMarker);
+  }
 
+  Future<void> saveMarkerToFirestore(Marker marker) async {
+    final markerData = {
+      'lat': marker.position.latitude,
+      'long': marker.position.longitude,
+      'marker_uid': FirebaseAuth.instance.currentUser?.uid,
+    };
+
+    try {
+      await FirebaseFirestore.instance.collection('markers').add(markerData);
+      print('Marker saved to Firestore');
+    } catch (error) {
+      print('Failed to save marker: $error');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+        onTap: () {
+      resetLogoutTimer();
+    },
+    child: Scaffold(
       key: scaffoldKey,
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFFEFEFEF),
@@ -129,12 +174,13 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       ),
         ),
       body:GoogleMap(
-        onMapCreated:_onMapCreated,
-        onTap: _addMarker,
-        initialCameraPosition: CameraPosition(target: _initialcameraposition, zoom: 15),
-        myLocationEnabled: true,
-        zoomControlsEnabled: true,
-      ),
+            onMapCreated:_onMapCreated,
+            onTap: (LatLng position){addMarker(position);},
+            markers: Set<Marker>.from(_markersList),
+            initialCameraPosition: CameraPosition(target: _initialcameraposition, zoom: 15),
+            myLocationEnabled: true,
+            zoomControlsEnabled: true,
+          ),
       bottomNavigationBar: BottomAppBar(
         notchMargin: 3.0,
         shape: const CircularNotchedRectangle(),
@@ -173,7 +219,9 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                   IconButton(
                     color: Colors.white,
                     onPressed: () {
-                      print("mark place pressed");
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return MarkHistoryPageWidget();
+                      }));
                     },
                     icon: const Icon(Icons.pin_drop_sharp),
                   ),
@@ -188,6 +236,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         ),
       ),
 
+    ),
     );
   }
 
@@ -219,6 +268,11 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         _initialcameraposition = LatLng(_currentPosition.latitude!,_currentPosition.longitude!);
           });
         });
+    
+  @override
+  void dispose() {
+    logoutTimer.cancel();
+    super.dispose();
   }
 
   Future<LocationData?> getLiveLocation() async {

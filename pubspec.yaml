@@ -93,6 +93,7 @@ flutter:
   assets:
      - assets/maptheme/silver.json
      - assets/markers/custom_marker_blue.png
+     - assets/images/welcome_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

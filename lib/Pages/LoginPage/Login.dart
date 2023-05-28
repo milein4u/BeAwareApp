@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:woman_safety_app/Pages/LoginPage/ForgottenPassword.dart';
 
 import '../MapHomePage.dart';
 import '../StartPage.dart';
+import '../flutter_flow/flutter_flow_google_map.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
@@ -30,6 +32,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   late bool passwordLoginVisibility;
   late bool emailAddressVisibility;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  List<Marker> _markers = [];
 
   Future errorMessage(String message)
   async {
@@ -52,6 +55,21 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
+  void fetchMarkersFromFirestore() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final markersSnapshot = await FirebaseFirestore.instance
+        .collection('markers')
+        .where('userId', isEqualTo: user?.uid)
+        .get();
+
+    setState(() {
+      _markers = markersSnapshot.docs.map((doc) {
+        // Map marker data to Marker objects
+      }).cast<Marker>().toList();
+    });
+  }
+
+
   Future signIn() async {
     try {
       final credential = await FirebaseAuth.instance
@@ -59,38 +77,32 @@ class _LoginWidgetState extends State<LoginWidget> {
           email: emailAddressController.text.trim(),
           password: passwordLoginController.text.trim()
       );
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.blueGrey,
+            content: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                  'You will be automatically logged out after 72 hours of inactivity.'),
+            ),
+            duration: Duration(seconds: 10),
+          )
+      );
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (contex) => MapHomePageWidget(),
         ),
       );
+      fetchMarkersFromFirestore();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         errorMessage("Incorrect credentials!") ?? false;
       } else if (e.code == 'wrong-password') {
+        errorMessage("Incorrect credentials!") ?? false;
       }
     }
   }
 
-    Route _createRoute() {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            StartPageWidget(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 1.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-
-          var tween = Tween(begin: begin, end: end).chain(
-              CurveTween(curve: curve));
-
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          );
-        },
-      );
-    }
 
     @override
     void initState() {
@@ -322,7 +334,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 24, 0, 0),
             child: FFButtonWidget(
-              onPressed: () => signIn(),
+              onPressed: () { signIn(); },
               text: 'Login',
               options: FFButtonOptions(
                 width: 270,
