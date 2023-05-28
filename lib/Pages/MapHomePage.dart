@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+// import 'package:sms/sms.dart';
 import 'EmergencyContactsPage.dart';
 import 'MarkHistoryPage.dart';
 
@@ -27,6 +27,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   late LatLng googleMapsCenter;
   late Marker marker;
   late LocationData _currentPosition;
+  late LocationData _liveLocation;
   final Completer<GoogleMapController> _cntr = Completer();
   List<Marker> _markersList =[];
   Location location = Location();
@@ -166,7 +167,8 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         child: IconButton(
         color: Colors.white,
         onPressed: () {
-          print("add pressed");
+          // _sendLocationSMS();
+          print('sent location');
         },
         icon: const Icon(Icons.sos),
       ),
@@ -266,12 +268,55 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         _initialcameraposition = LatLng(_currentPosition.latitude!,_currentPosition.longitude!);
           });
         });
-  }
-
+    
   @override
   void dispose() {
     logoutTimer.cancel();
     super.dispose();
   }
+
+  Future<LocationData?> getLiveLocation() async {
+    Location location = Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    // Check if location services are enabled
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return null;
+      }
+    }
+
+    // Check if location permission is granted
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return null;
+      }
+    }
+    _liveLocation = await location.getLocation();
+    return _liveLocation;
+  }
+
+  // void sendLocationSMS(String phoneNumber, LocationData locationData) {
+  //   SmsSender sender = SmsSender();
+  //   String message = 'My current location: https://www.google.com/maps/place/${locationData.latitude},${locationData.longitude}';
+  //   SmsMessage smsMessage = SmsMessage(phoneNumber, message);
+  //
+  //   sender.sendSms(smsMessage);
+  // }
+
+  // Future<void> _sendLocationSMS() async {
+  //   LocationData? locationData = await getLiveLocation();
+  //   if (locationData != null) {
+  //     sendLocationSMS('0755186487', locationData);
+  //   } else {
+  //     // Handle the case where the location data is null
+  //     print('Unable to retrieve location data');
+  //   }
+  // }
 
 }
