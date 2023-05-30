@@ -14,6 +14,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 
 class MarkHistoryPageWidget extends StatefulWidget {
   const MarkHistoryPageWidget({Key? key}) : super(key: key);
@@ -24,11 +26,72 @@ class MarkHistoryPageWidget extends StatefulWidget {
 
 class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  List<MarkerData> _markerList = [];
 
   @override
   void initState() {
     super.initState();
+    fetchMarkersFromFirestore();
+  }
+
+  Future<String> getAddressFromLatLng(double latitude, double longitude) async {
+    String address = '';
+
+    try {
+      List<geocoding.Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        geocoding.Placemark placemark = placemarks.first;
+        address = '${placemark.street}, ${placemark.locality}, ${placemark.country}';
+      }
+    } catch (e) {
+      print('Error fetching address: $e');
+    }
+
+    return address;
+  }
+
+
+  void fetchMarkersFromFirestore() async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('markers')
+        .where("marker_uid",isEqualTo: userId.toString())
+        .get();
+
+    List<MarkerData> markers = []; // Temporary list to store fetched markers
+
+    querySnapshot.docs.forEach((document) {
+      double latitude = document['lat'];
+      double longitude = document['long'];
+      //String adress = getAddressFromLatLng(latitude, longitude) as String;
+      String category = document['category'];
+      // Fetch address based on position using geocoding APIs or other methods
+
+      MarkerData markerData = MarkerData(
+        markerId: document.id,
+        category: category,
+        address: "Adress", // Replace with actual address
+      );
+
+      markers.add(markerData);
+    });
+
+    setState(() {
+      _markerList = markers; // Update the marker list state
+    });
+    print(_markerList);
+  }
+
+  Future<void> deleteMarker(String markerId) async {
+    await FirebaseFirestore.instance
+        .collection('markers')
+        .doc(markerId)
+        .delete();
+
+    setState(() {
+      _markerList.removeWhere((marker) => marker.markerId == markerId);
+    });
   }
 
   @override
@@ -81,7 +144,48 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
             elevation: 0,
           ),
         ),
+        body: ListView.builder(
+        itemCount: _markerList.length,
+        itemBuilder: (context, index) {
+          MarkerData markerData = _markerList[index];
+          return Dismissible(
+            key: Key(markerData.markerId),
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) {
+              deleteMarker(markerData.markerId);
+            },
+            background: Container(
+              color: Colors.red,
+              child: Icon(Icons.delete),
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.only(right: 16.0),
+            ),
+            child: ListTile(
+              title: Text(markerData.category),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(markerData.address),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
+}
+
+class MarkerData {
+  final String markerId;
+  final String category;
+  final String address;
+
+
+  MarkerData({
+    required this.markerId,
+    required this.category,
+    required this.address,
+  });
 }

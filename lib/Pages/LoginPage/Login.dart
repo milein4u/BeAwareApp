@@ -85,7 +85,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               child: Text(
                   'You will be automatically logged out after 72 hours of inactivity.'),
             ),
-            duration: Duration(seconds: 10),
+            duration: Duration(seconds: 5),
           )
       );
       await Navigator.of(context).push(
@@ -98,7 +98,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       if (e.code == 'user-not-found') {
         errorMessage("Incorrect credentials!") ?? false;
       } else if (e.code == 'wrong-password') {
-        errorMessage("Incorrect credentials!") ?? false;
+        errorMessage("Incorrect pass!") ?? false;
       }
     }
   }

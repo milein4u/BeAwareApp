@@ -13,6 +13,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'EmergencyContactsPage.dart';
 import 'MarkHistoryPage.dart';
 
+
+
 class MapHomePageWidget extends StatefulWidget {
   const MapHomePageWidget({Key? key}) : super(key: key);
 
@@ -29,30 +31,32 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   late LocationData _currentPosition;
   late LocationData _liveLocation;
   final Completer<GoogleMapController> _cntr = Completer();
-  List<Marker> _markersList =[];
+  List<Marker> _markersList = [];
   Location location = Location();
   LatLng _initialcameraposition = LatLng(45.760696, 21.226788);
   String mapTheme = '';
-  final markersSnapshot = FirebaseFirestore.instance.collection('markers').get();
+  final markersSnapshot = FirebaseFirestore.instance.collection('markers')
+      .get();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     logoutTimer = Timer(Duration.zero, handleLogout);
     logoutTimerStart();
     fetchMarkersFromFirestore();
     getLoc();
-    DefaultAssetBundle.of(context).loadString('assets/maptheme/silver.json').then((string) {
+    DefaultAssetBundle.of(context)
+        .loadString('assets/maptheme/silver.json')
+        .then((string) {
       mapTheme = string;
       print(mapTheme);
     }).catchError((error) {
       print('here');
       log(error.toString());
     });
-
   }
 
-  Future logoutTimerStart() async{
+  Future logoutTimerStart() async {
     const inactivityDuration = Duration(hours: 72);
 
     if (logoutTimer != null) {
@@ -60,11 +64,10 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     }
 
     logoutTimer = Timer(inactivityDuration, handleLogout);
-
   }
 
   void resetLogoutTimer() {
-    if(logoutTimer!=null) {
+    if (logoutTimer != null) {
       logoutTimer.cancel();
     }
     logoutTimerStart();
@@ -79,67 +82,103 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     }
   }
 
-  Future<void> fetchMarkersFromFirestore() async {
-    final markersSnapshot =
-    await FirebaseFirestore.instance.collection('markers').get();
-
-    setState(() {
-      _markersList = markersSnapshot.docs.map((doc) {
-        final markerData = doc.data();
-        final LatLng position =
-        LatLng(markerData['latitude'], markerData['longitude']);
-
-        return Marker(
-          markerId: MarkerId(doc.id),
-          position: position,
-        );
-      }).toList();
-    });
-  }
-
   void _onMapCreated(GoogleMapController controller) {
-
     mapController = controller;
     mapController.setMapStyle(mapTheme);
     _cntr.complete(mapController);
     location.onLocationChanged.listen((event) {
       mapController.animateCamera(
-          CameraUpdate.newCameraPosition(
+        CameraUpdate.newCameraPosition(
           CameraPosition(target:
-          LatLng(event.latitude!,event.longitude!),zoom: 20),
-          ),
+          LatLng(event.latitude!, event.longitude!), zoom: 20),
+        ),
       );
     });
   }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
-
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.Codec codec = await ui.instantiateImageCodec(
+        data.buffer.asUint8List(), targetWidth: width);
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
-
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer
+        .asUint8List();
   }
 
-  void addMarker(LatLng position) async{
-    final newMarker = Marker(
-      markerId: MarkerId(position.toString()),
-      position: position,
-    );
+  void addMarker(LatLng position) async {
+    showDialog(context: context,
+        builder: (BuildContext context) {
+          String selectedCategory;
+          return AlertDialog(
+            title: Text('Choose one of the following categories'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  ListTile(
+                    title: Text('Category 1'),
+                    onTap: () {
+                      selectedCategory = 'Category 1';
+                      Navigator.of(context).pop(selectedCategory);
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Category 2'),
+                    onTap: () {
+                      selectedCategory = 'Category 2';
+                      Navigator.of(context).pop(selectedCategory);
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Category 3'),
+                    onTap: () {
+                      selectedCategory = 'Category 3';
+                      Navigator.of(context).pop(selectedCategory);
+                    },
+                  ),
+                ],
+              )
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+    ).then((selectedCategory) async {
+      if (selectedCategory != null) {
+        final newMarker = Marker(
+          markerId: MarkerId(position.toString()),
+          position: position,
+          icon: BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(title: selectedCategory),
+        );
 
-    setState(() {
-      _markersList.add(newMarker);
+        setState(() {
+          _markersList.add(newMarker);
+        });
+
+        await saveMarkerToFirestore(newMarker, selectedCategory);
+        // Update the marker data in Firestore with the selected category
+
+        // Zoom in on the marker
+        mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(position, 20),
+        );
+      }
     });
-
-    // Save marker data to Firestore
-    await saveMarkerToFirestore(newMarker);
   }
 
-  Future<void> saveMarkerToFirestore(Marker marker) async {
+
+  Future<void> saveMarkerToFirestore(Marker marker, String category) async {
     final markerData = {
       'lat': marker.position.latitude,
       'long': marker.position.longitude,
       'marker_uid': FirebaseAuth.instance.currentUser?.uid,
+      'category': category,
     };
 
     try {
@@ -150,97 +189,125 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     }
   }
 
+  void fetchMarkersFromFirestore() async {
+    final markersSnapshot =
+    await FirebaseFirestore.instance.collection('markers').get();
+
+    List<Marker> markers = [];
+
+    markersSnapshot.docs.forEach((doc) {
+      double latitude = doc['lat'];
+      double longitude = doc['long'];
+
+      markers.add(
+        Marker(
+          markerId: MarkerId(doc.id),
+          position: LatLng(latitude, longitude),
+        ),
+      );
+    });
+
+    setState(() {
+      _markersList = markers;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-      resetLogoutTimer();
-    },
-    child: Scaffold(
-      key: scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xFFEFEFEF),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.large(
-        onPressed:(){},
-        backgroundColor: Colors.redAccent,
-        child: IconButton(
-        color: Colors.white,
-        onPressed: () {
-          // _sendLocationSMS();
-          print('sent location');
-        },
-        icon: const Icon(Icons.sos),
-      ),
-        ),
-      body:GoogleMap(
-            onMapCreated:_onMapCreated,
-            onTap: (LatLng position){addMarker(position);},
-            markers: Set<Marker>.from(_markersList),
-            initialCameraPosition: CameraPosition(target: _initialcameraposition, zoom: 15),
-            myLocationEnabled: true,
-            zoomControlsEnabled: true,
+      onTap: () {
+        resetLogoutTimer();
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Color(0xFFEFEFEF),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton.large(
+          onPressed: () {},
+          backgroundColor: Colors.redAccent,
+          child: IconButton(
+            color: Colors.white,
+            onPressed: () {
+              // _sendLocationSMS();
+              print('sent location');
+            },
+            icon: const Icon(Icons.sos),
           ),
-      bottomNavigationBar: BottomAppBar(
-        notchMargin: 3.0,
-        shape: const CircularNotchedRectangle(),
-        color: Colors.indigoAccent,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(
-              padding:const EdgeInsets.only(right: 130.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        return EmergencyContactsPageWidget();
-                      }));
-                    },
-                    icon: const Icon(Icons.phone),
-                  ),
-                  const Text(
-                    "Emergency contacts",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding:const EdgeInsets.only(right: 20.0, left: 10.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                verticalDirection: VerticalDirection.down,
-                children: [
-                  IconButton(
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        return MarkHistoryPageWidget();
-                      }));
-                    },
-                    icon: const Icon(Icons.pin_drop_sharp),
-                  ),
-                  const Text(
-                    "Mark history",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
-            )
-          ],
         ),
-      ),
+        body: GoogleMap(
+          onMapCreated: _onMapCreated,
+          markers: Set<Marker>.of(_markersList),
+          onTap: (LatLng position) {
+            addMarker(position);
+          },
+          initialCameraPosition: CameraPosition(
+              target: _initialcameraposition, zoom: 15),
+          myLocationEnabled: true,
+          zoomControlsEnabled: true,
+        ),
+        bottomNavigationBar: BottomAppBar(
+          notchMargin: 3.0,
+          shape: const CircularNotchedRectangle(),
+          color: Colors.indigoAccent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 130.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      color: Colors.white,
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (
+                            context) {
+                          return EmergencyContactsPageWidget();
+                        }));
+                      },
+                      icon: const Icon(Icons.phone),
+                    ),
+                    const Text(
+                      "Emergency contacts",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0, left: 10.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  verticalDirection: VerticalDirection.down,
+                  children: [
+                    IconButton(
+                      color: Colors.white,
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (
+                            context) {
+                          return MarkHistoryPageWidget();
+                        }));
+                      },
+                      icon: const Icon(Icons.pin_drop_sharp),
+                    ),
+                    const Text(
+                      "Mark history",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
 
-    ),
+      ),
     );
   }
 
-  getLoc() async{
+  getLoc() async {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
@@ -261,62 +328,65 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     }
 
     _currentPosition = await location.getLocation();
-    _initialcameraposition = LatLng(_currentPosition.latitude!,_currentPosition.longitude!);
+    _initialcameraposition =
+        LatLng(_currentPosition.latitude!, _currentPosition.longitude!);
     location.onLocationChanged.listen((LocationData currentLocation) {
       setState(() {
         _currentPosition = currentLocation;
-        _initialcameraposition = LatLng(_currentPosition.latitude!,_currentPosition.longitude!);
-          });
-        });
-    
-  @override
-  void dispose() {
-    logoutTimer.cancel();
-    super.dispose();
-  }
+        _initialcameraposition =
+            LatLng(_currentPosition.latitude!, _currentPosition.longitude!);
+      });
+    });
 
-  Future<LocationData?> getLiveLocation() async {
-    Location location = Location();
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
+    @override
+    void dispose() {
+      logoutTimer.cancel();
+      super.dispose();
+    }
 
-    // Check if location services are enabled
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
+    Future<LocationData?> getLiveLocation() async {
+      Location location = Location();
+      bool _serviceEnabled;
+      PermissionStatus _permissionGranted;
+
+      // Check if location services are enabled
+      _serviceEnabled = await location.serviceEnabled();
       if (!_serviceEnabled) {
-        return null;
+        _serviceEnabled = await location.requestService();
+        if (!_serviceEnabled) {
+          return null;
+        }
       }
+
+      // Check if location permission is granted
+      _permissionGranted = await location.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await location.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {
+          return null;
+        }
+      }
+      _liveLocation = await location.getLocation();
+      return _liveLocation;
     }
 
-    // Check if location permission is granted
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return null;
-      }
-    }
-    _liveLocation = await location.getLocation();
-    return _liveLocation;
+    // void sendLocationSMS(String phoneNumber, LocationData locationData) {
+    //   SmsSender sender = SmsSender();
+    //   String message = 'My current location: https://www.google.com/maps/place/${locationData.latitude},${locationData.longitude}';
+    //   SmsMessage smsMessage = SmsMessage(phoneNumber, message);
+    //
+    //   sender.sendSms(smsMessage);
+    // }
+
+    // Future<void> _sendLocationSMS() async {
+    //   LocationData? locationData = await getLiveLocation();
+    //   if (locationData != null) {
+    //     sendLocationSMS('0755186487', locationData);
+    //   } else {
+    //     // Handle the case where the location data is null
+    //     print('Unable to retrieve location data');
+    //   }
+    // }
+
   }
-
-  // void sendLocationSMS(String phoneNumber, LocationData locationData) {
-  //   SmsSender sender = SmsSender();
-  //   String message = 'My current location: https://www.google.com/maps/place/${locationData.latitude},${locationData.longitude}';
-  //   SmsMessage smsMessage = SmsMessage(phoneNumber, message);
-  //
-  //   sender.sendSms(smsMessage);
-  // }
-
-  // Future<void> _sendLocationSMS() async {
-  //   LocationData? locationData = await getLiveLocation();
-  //   if (locationData != null) {
-  //     sendLocationSMS('0755186487', locationData);
-  //   } else {
-  //     // Handle the case where the location data is null
-  //     print('Unable to retrieve location data');
-  //   }
-  // }
-
 }
