@@ -3,7 +3,7 @@ class EmergencyNumber {
   String? phone;
   DateTime? created;
 
-  EmergencyNumber();
+  EmergencyNumber({required String name, required String phone});
 
   EmergencyNumber.fromSnapshot(snapshot)
       : name = snapshot.data()['name'],

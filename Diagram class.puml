@@ -1,0 +1,511 @@
+@startuml
+set namespaceSeparator ::
+
+class "woman_safety_app::main.dart::MyApp" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "woman_safety_app::main.dart::MyApp"
+
+class "woman_safety_app::Model::EmergencyNumber.dart::EmergencyNumber" {
+  +String? name
+  +String? phone
+  +DateTime? created
+  +Map<String, dynamic> toFirestore()
+}
+
+class "woman_safety_app::Model::User.dart::Users" {
+  +String? email
+  +String? phone
+  +Map<String, dynamic> toFirestore()
+}
+
+class "woman_safety_app::Pages::Cards::emergencyContactCard.dart::ContactCard" {
+  +EmergencyNumber number
+  +CollectionReference<Object?> collectionRef
+  +Future<dynamic> deleteNumber()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::Cards::emergencyContactCard.dart::ContactCard" o-- "woman_safety_app::Model::EmergencyNumber.dart::EmergencyNumber"
+"woman_safety_app::Pages::Cards::emergencyContactCard.dart::ContactCard" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "woman_safety_app::Pages::Cards::emergencyContactCard.dart::ContactCard"
+
+class "woman_safety_app::Pages::EmergencyContactsPage.dart::EmergencyContactsPageWidget" {
+  +_EmergencyContactsPageWidgetState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::EmergencyContactsPage.dart::EmergencyContactsPageWidget"
+
+class "woman_safety_app::Pages::EmergencyContactsPage.dart::_EmergencyContactsPageWidgetState" {
+  +GlobalKey<ScaffoldState> scaffoldKey
+  +TextEditingController nameController
+  +TextEditingController phoneController
+  +EmergencyNumber emergencyNumber
+  +CollectionReference<Object?> collectionRef
+  +List<DocumentSnapshot<Object?>> items
+  +bool ascendingOrder
+  +void initState()
+  +void dispose()
+  +void didChangeDependencies()
+  +Future<List<DocumentSnapshot<Object?>>> fetchItems()
+  +void sortItems()
+  +Future<void> editContact()
+  +Future<void> addContact()
+  +Future<void> deleteContact()
+  +Future<dynamic> sort()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::EmergencyContactsPage.dart::_EmergencyContactsPageWidgetState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"woman_safety_app::Pages::EmergencyContactsPage.dart::_EmergencyContactsPageWidgetState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"woman_safety_app::Pages::EmergencyContactsPage.dart::_EmergencyContactsPageWidgetState" o-- "woman_safety_app::Model::EmergencyNumber.dart::EmergencyNumber"
+"woman_safety_app::Pages::EmergencyContactsPage.dart::_EmergencyContactsPageWidgetState" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::EmergencyContactsPage.dart::_EmergencyContactsPageWidgetState"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationState" {
+  +Offset offset
+  +double opacity
+  +double scale
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationState" o-- "dart::ui::Offset"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationInfo" {
+  +Curve curve
+  +AnimationTrigger trigger
+  +int duration
+  +int delay
+  +bool fadeIn
+  +AnimationState initialState
+  +AnimationState finalState
+  +CurvedAnimation curvedAnimation
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationInfo" o-- "flutter::src::animation::curves.dart::Curve"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationInfo" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationTrigger"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationInfo" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationState"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationInfo" o-- "flutter::src::animation::animations.dart::CurvedAnimation"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationTrigger" {
+  +int index
+  {static} +List<AnimationTrigger> values
+  {static} +AnimationTrigger onPageLoad
+  {static} +AnimationTrigger onActionTrigger
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationTrigger" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationTrigger"
+"dart::core::Enum" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_animations.dart::AnimationTrigger"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowMarker" {
+  +String markerId
+  +LatLng location
+  +Future<dynamic> Function()? onTap
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowMarker" o-- "woman_safety_app::Pages::flutter_flow::lat_lng.dart::LatLng"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowMarker" o-- "null::Future<dynamic> Function()"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" {
+  +Completer<GoogleMapController> controller
+  +dynamic Function(LatLng)? onCameraIdle
+  +LatLng? initialLocation
+  +Iterable<FlutterFlowMarker> markers
+  +GoogleMarkerColor markerColor
+  +MapType mapType
+  +GoogleMapStyle style
+  +double initialZoom
+  +bool allowInteraction
+  +bool allowZoom
+  +bool showZoomControls
+  +bool showLocation
+  +bool showCompass
+  +bool showMapToolbar
+  +bool showTraffic
+  +bool centerMapOnMarkerTap
+  +State<StatefulWidget> createState()
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" o-- "dart::async::Completer<GoogleMapController>"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" o-- "null::dynamic Function(LatLng)"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" o-- "woman_safety_app::Pages::flutter_flow::lat_lng.dart::LatLng"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMarkerColor"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" o-- "google_maps_flutter_platform_interface::src::types::ui.dart::MapType"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMapStyle"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::FlutterFlowGoogleMap"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::_FlutterFlowGoogleMapState" {
+  -Completer<GoogleMapController> _controller
+  +LatLng currentMapCenter
+  +double initialZoom
+  +LatLng initialPosition
+  +void onCameraIdle()
+  +void initState()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::_FlutterFlowGoogleMapState" o-- "dart::async::Completer<GoogleMapController>"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::_FlutterFlowGoogleMapState" o-- "google_maps_flutter_platform_interface::src::types::location.dart::LatLng"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::_FlutterFlowGoogleMapState"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMapStyle" {
+  +int index
+  {static} +List<GoogleMapStyle> values
+  {static} +GoogleMapStyle standard
+  {static} +GoogleMapStyle silver
+  {static} +GoogleMapStyle retro
+  {static} +GoogleMapStyle dark
+  {static} +GoogleMapStyle night
+  {static} +GoogleMapStyle aubergine
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMapStyle" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMapStyle"
+"dart::core::Enum" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMapStyle"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMarkerColor" {
+  +int index
+  {static} +List<GoogleMarkerColor> values
+  {static} +GoogleMarkerColor red
+  {static} +GoogleMarkerColor orange
+  {static} +GoogleMarkerColor yellow
+  {static} +GoogleMarkerColor green
+  {static} +GoogleMarkerColor cyan
+  {static} +GoogleMarkerColor azure
+  {static} +GoogleMarkerColor blue
+  {static} +GoogleMarkerColor violet
+  {static} +GoogleMarkerColor magenta
+  {static} +GoogleMarkerColor rose
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMarkerColor" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMarkerColor"
+"dart::core::Enum" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_google_map.dart::GoogleMarkerColor"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_icon_button.dart::FlutterFlowIconButton" {
+  +double? borderRadius
+  +double? buttonSize
+  +Color? fillColor
+  +Color? borderColor
+  +double? borderWidth
+  +Widget icon
+  +void Function()? onPressed
+  +dynamic ontap
+  +Widget build()
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_icon_button.dart::FlutterFlowIconButton" o-- "dart::ui::Color"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_icon_button.dart::FlutterFlowIconButton" o-- "flutter::src::widgets::framework.dart::Widget"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_icon_button.dart::FlutterFlowIconButton" o-- "null::void Function()"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_icon_button.dart::FlutterFlowIconButton"
+
+abstract class "woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::FlutterFlowTheme" {
+  +Color primaryColor
+  +Color secondaryColor
+  +Color tertiaryColor
+  +Color alternate
+  +Color primaryBackground
+  +Color secondaryBackground
+  +Color primaryText
+  +Color secondaryText
+  +Color primaryBtnText
+  +Color lineColor
+  +Color gray600
+  +Color black600
+  +Color tertiary400
+  {static} +ThemeMode themeMode
+  +TextStyle title1
+  +TextStyle title2
+  +TextStyle title3
+  +TextStyle subtitle1
+  +TextStyle subtitle2
+  +TextStyle bodyText1
+  +TextStyle bodyText2
+  {static} +Future<dynamic> initialize()
+  {static} +void saveThemeMode()
+  {static} +FlutterFlowTheme of()
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::FlutterFlowTheme" o-- "dart::ui::Color"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::FlutterFlowTheme" o-- "flutter::src::material::app.dart::ThemeMode"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::FlutterFlowTheme" o-- "flutter::src::painting::text_style.dart::TextStyle"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::LightModeTheme" {
+  +Color primaryColor
+  +Color secondaryColor
+  +Color tertiaryColor
+  +Color alternate
+  +Color primaryBackground
+  +Color secondaryBackground
+  +Color primaryText
+  +Color secondaryText
+  +Color primaryBtnText
+  +Color lineColor
+  +Color gray600
+  +Color black600
+  +Color tertiary400
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::LightModeTheme" o-- "dart::ui::Color"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::FlutterFlowTheme" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::LightModeTheme"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::DarkModeTheme" {
+  +Color primaryColor
+  +Color secondaryColor
+  +Color tertiaryColor
+  +Color alternate
+  +Color primaryBackground
+  +Color secondaryBackground
+  +Color primaryText
+  +Color secondaryText
+  +Color primaryBtnText
+  +Color lineColor
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::DarkModeTheme" o-- "dart::ui::Color"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::FlutterFlowTheme" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_theme.dart::DarkModeTheme"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::FormatType" {
+  +int index
+  {static} +List<FormatType> values
+  {static} +FormatType decimal
+  {static} +FormatType percent
+  {static} +FormatType scientific
+  {static} +FormatType compact
+  {static} +FormatType compactLong
+  {static} +FormatType custom
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::FormatType" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::FormatType"
+"dart::core::Enum" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::FormatType"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::DecimalType" {
+  +int index
+  {static} +List<DecimalType> values
+  {static} +DecimalType automatic
+  {static} +DecimalType periodDecimal
+  {static} +DecimalType commaDecimal
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::DecimalType" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::DecimalType"
+"dart::core::Enum" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_util.dart::DecimalType"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonOptions" {
+  +TextStyle? textStyle
+  +double? elevation
+  +double? height
+  +double? width
+  +EdgeInsetsGeometry? padding
+  +Color? color
+  +Color? disabledColor
+  +Color? disabledTextColor
+  +Color? splashColor
+  +double? iconSize
+  +Color? iconColor
+  +EdgeInsetsGeometry? iconPadding
+  +double? borderRadius
+  +BorderSide? borderSide
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonOptions" o-- "flutter::src::painting::text_style.dart::TextStyle"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonOptions" o-- "flutter::src::painting::edge_insets.dart::EdgeInsetsGeometry"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonOptions" o-- "dart::ui::Color"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonOptions" o-- "flutter::src::painting::borders.dart::BorderSide"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonWidget" {
+  +String text
+  +Widget? icon
+  +IconData? iconData
+  +dynamic Function() onPressed
+  +FFButtonOptions options
+  +bool showLoadingIndicator
+  +State<FFButtonWidget> createState()
+}
+
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonWidget" o-- "flutter::src::widgets::framework.dart::Widget"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonWidget" o-- "flutter::src::widgets::icon_data.dart::IconData"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonWidget" o-- "null::dynamic Function()"
+"woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonWidget" o-- "woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonOptions"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::FFButtonWidget"
+
+class "woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::_FFButtonWidgetState" {
+  +bool loading
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::flutter_flow::flutter_flow_widgets.dart::_FFButtonWidgetState"
+
+class "woman_safety_app::Pages::flutter_flow::lat_lng.dart::LatLng" {
+  +double latitude
+  +double longitude
+  +int hashCode
+  +String toString()
+  +String serialize()
+  +bool ==()
+}
+
+class "woman_safety_app::Pages::LoginPage::ForgottenPassword.dart::ForgottenPasswordWidget" {
+  +_ForgottenPasswordWidgetState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::LoginPage::ForgottenPassword.dart::ForgottenPasswordWidget"
+
+class "woman_safety_app::Pages::LoginPage::ForgottenPassword.dart::_ForgottenPasswordWidgetState" {
+  +GlobalKey<ScaffoldState> scaffoldKey
+  +TextEditingController newPasswordController
+  +TextEditingController emailController
+  +void dispose()
+  +String hashPassword()
+  +Future<dynamic> passwordReset()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::LoginPage::ForgottenPassword.dart::_ForgottenPasswordWidgetState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"woman_safety_app::Pages::LoginPage::ForgottenPassword.dart::_ForgottenPasswordWidgetState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::LoginPage::ForgottenPassword.dart::_ForgottenPasswordWidgetState"
+
+class "woman_safety_app::Pages::LoginPage::Login.dart::LoginWidget" {
+  +_LoginWidgetState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::LoginPage::Login.dart::LoginWidget"
+
+class "woman_safety_app::Pages::LoginPage::Login.dart::_LoginWidgetState" {
+  +TextEditingController emailAddressController
+  +TextEditingController passwordLoginController
+  +TextEditingController passwordConfirmedLoginController
+  +bool isloading
+  +bool passwordLoginVisibility
+  +bool emailAddressVisibility
+  +GlobalKey<ScaffoldState> scaffoldKey
+  -List<Marker> _markers
+  +Future<dynamic> errorMessage()
+  +void fetchMarkersFromFirestore()
+  +Future<dynamic> signIn()
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::LoginPage::Login.dart::_LoginWidgetState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"woman_safety_app::Pages::LoginPage::Login.dart::_LoginWidgetState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::LoginPage::Login.dart::_LoginWidgetState"
+
+class "woman_safety_app::Pages::MapHomePage.dart::MapHomePageWidget" {
+  +_MapHomePageWidgetState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::MapHomePage.dart::MapHomePageWidget"
+
+class "woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" {
+  +GlobalKey<ScaffoldState> scaffoldKey
+  +Timer logoutTimer
+  +GoogleMapController mapController
+  +LatLng googleMapsCenter
+  +Marker marker
+  -LocationData _currentPosition
+  -LocationData _liveLocation
+  -Completer<GoogleMapController> _cntr
+  -List<Marker> _markersList
+  +Location location
+  -LatLng _initialcameraposition
+  +String mapTheme
+  +Future<QuerySnapshot<Map<String, dynamic>>> markersSnapshot
+  +List<String> recipents
+  +String message
+  {static} +MethodChannel platform
+  +int volumeDownCount
+  +void initState()
+  +Future<void> enableVolumeButtonHandler()
+  +Future<void> handleVolumeButtonPress()
+  +Future<dynamic> logoutTimerStart()
+  +void resetLogoutTimer()
+  +void handleLogout()
+  -void _onMapCreated()
+  +Future<Uint8List> getBytesFromAsset()
+  +void addMarker()
+  +Future<void> saveMarkerToFirestore()
+  +void fetchMarkersFromFirestore()
+  -void _handleMarkerDeleted()
+  +Future<LocationData?> getLiveLocation()
+  +String smsTextLocation()
+  -void _sendSMS()
+  +Widget build()
+  +dynamic getLoc()
+}
+
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "dart::async::Timer"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "google_maps_flutter::google_maps_flutter.dart::GoogleMapController"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "google_maps_flutter_platform_interface::src::types::location.dart::LatLng"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "google_maps_flutter_platform_interface::src::types::marker.dart::Marker"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "location_platform_interface::location_platform_interface.dart::LocationData"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "dart::async::Completer<GoogleMapController>"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "location::location.dart::Location"
+"woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState" o-- "flutter::src::services::platform_channel.dart::MethodChannel"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::MapHomePage.dart::_MapHomePageWidgetState"
+
+class "woman_safety_app::Pages::MarkHistoryPage.dart::MarkHistoryPageWidget" {
+  +_MarkHistoryPageWidgetState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::MarkHistoryPage.dart::MarkHistoryPageWidget"
+
+class "woman_safety_app::Pages::MarkHistoryPage.dart::_MarkHistoryPageWidgetState" {
+  +GlobalKey<ScaffoldState> scaffoldKey
+  -List<DocumentSnapshot<Object?>> _markerList
+  +void initState()
+  +Future<List<DocumentSnapshot<Object?>>> fetchMarkers()
+  +Future<void> deleteMarker()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::MarkHistoryPage.dart::_MarkHistoryPageWidgetState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::MarkHistoryPage.dart::_MarkHistoryPageWidgetState"
+
+class "woman_safety_app::Pages::SignupPage::Signup.dart::SignupWidget" {
+  +_SignupWidgetState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "woman_safety_app::Pages::SignupPage::Signup.dart::SignupWidget"
+
+class "woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState" {
+  +bool confirmPasswordVisibility
+  +TextEditingController emailAddressController
+  +TextEditingController passwordController
+  +TextEditingController phoneController
+  +TextEditingController? confirmPasswordController
+  +bool passwordVisibility
+  +User currentUser
+  {static} -Users _user
+  +bool isloading
+  -FirebaseAuth _auth
+  +GlobalKey<ScaffoldState> scaffoldKey
+  +void initState()
+  +void dispose()
+  +void getCurrentUser()
+  +Future<dynamic> errorMessage()
+  +bool isValidEmail()
+  +bool emailConfirmed()
+  +bool isValidPhoneNumber()
+  +bool phoneConfirmed()
+  +String hashPassword()
+  +Future<dynamic> addUserDetails()
+  +bool confirmedPassword()
+  +Future<dynamic> register()
+  +Widget build()
+}
+
+"woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState" o-- "firebase_auth::firebase_auth.dart::User"
+"woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState" o-- "woman_safety_app::Model::User.dart::Users"
+"woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth"
+"woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::SignupPage::Signup.dart::_SignupWidgetState"
+
+class "woman_safety_app::Pages::StartPage.dart::StartPageWidget" {
+  +_StartPageWidgetState createState()
+ting::text_style.dart::TextStyle"
+"flutter::src::widgets::framework.dart::State" <|-- "woman_safety_app::Pages::StartPage.dart::_StartPageWidgetState"
+
+}
+
+@enduml

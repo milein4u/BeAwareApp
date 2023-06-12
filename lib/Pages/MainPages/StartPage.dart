@@ -1,13 +1,6 @@
-import 'LoginPage/Login.dart';
-import 'SignupPage/Signup.dart';
-import 'flutter_flow/flutter_flow_theme.dart';
-import 'flutter_flow/flutter_flow_util.dart';
-import 'flutter_flow/flutter_flow_widgets.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart'
-as smooth_page_indicator;
+import '../LoginPage/Login.dart';
+import '../SignupPage/Signup.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 
 class StartPageWidget extends StatefulWidget {
   const StartPageWidget({Key? key}) : super(key: key);
@@ -41,7 +34,6 @@ class _StartPageWidgetState extends State<StartPageWidget> {
           const begin = Offset(0.0, -1.0);
           const end = Offset.zero;
           const curve = Curves.easeInOutSine;
-
           var tween = Tween(begin: begin, end: end).chain(
               CurveTween(curve: curve));
 
@@ -57,10 +49,9 @@ class _StartPageWidgetState extends State<StartPageWidget> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             const SignupWidget(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 1.0);
+          const begin = Offset(0.0, -1.0);
           const end = Offset.zero;
           const curve = Curves.easeInOutSine;
-
           var tween = Tween(begin: begin, end: end).chain(
               CurveTween(curve: curve));
 

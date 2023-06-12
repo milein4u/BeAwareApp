@@ -1,19 +1,10 @@
-import 'dart:io';
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../StartPage.dart';
-import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
-import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
@@ -39,7 +30,6 @@ class _SignupWidgetState extends State<SignupWidget> {
   TextEditingController? confirmPasswordController;
   late bool passwordVisibility;
   late User currentUser;
-  static Users _user = Users();
   bool isloading = false;
 
   final _auth = FirebaseAuth.instance;

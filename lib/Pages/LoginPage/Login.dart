@@ -2,17 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:woman_safety_app/Pages/LoginPage/ForgottenPassword.dart';
 
-import '../MapHomePage.dart';
-import '../StartPage.dart';
+import '../MainPages/MapHomePage.dart';
 import '../flutter_flow/flutter_flow_google_map.dart';
-import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
-import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -32,7 +27,6 @@ class _LoginWidgetState extends State<LoginWidget> {
   late bool passwordLoginVisibility;
   late bool emailAddressVisibility;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Marker> _markers = [];
 
   Future errorMessage(String message)
   async {
@@ -63,9 +57,6 @@ class _LoginWidgetState extends State<LoginWidget> {
         .get();
 
     setState(() {
-      _markers = markersSnapshot.docs.map((doc) {
-        // Map marker data to Marker objects
-      }).cast<Marker>().toList();
     });
   }
 

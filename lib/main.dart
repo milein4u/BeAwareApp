@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:woman_safety_app/Pages/MapHomePage.dart';
-import 'package:woman_safety_app/Pages/StartPage.dart';
-
+import 'package:woman_safety_app/Pages/MainPages/MapHomePage.dart';
+import 'package:woman_safety_app/Pages/MainPages/StartPage.dart';
+import 'package:dcdg/dcdg.dart';
 import 'Pages/LoginPage/Login.dart';
 import 'Pages/SignupPage/Signup.dart';
 

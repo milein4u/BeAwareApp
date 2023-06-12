@@ -2,17 +2,16 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:sms/sms.dart';
-import 'EmergencyContactsPage.dart';
-import 'MarkHistoryPage.dart';
-
+import '../FunctionalitiesPages/EmergencyContactsPage.dart';
+import '../FunctionalitiesPages/MarkHistoryPage.dart';
 
 
 class MapHomePageWidget extends StatefulWidget {
@@ -24,23 +23,28 @@ class MapHomePageWidget extends StatefulWidget {
 
 class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late Timer logoutTimer;
-  late GoogleMapController mapController;
   late LatLng googleMapsCenter;
-  late Marker marker;
   late LocationData _currentPosition;
-  late LocationData _liveLocation;
+  late GoogleMapController mapController;
+  late Marker marker;
+  late Timer logoutTimer;
   final Completer<GoogleMapController> _cntr = Completer();
+  final markersSnapshot = FirebaseFirestore.instance.collection('markers').get();
   List<Marker> _markersList = [];
+  List<String> recipents = [];
   Location location = Location();
   LatLng _initialcameraposition = LatLng(45.760696, 21.226788);
   String mapTheme = '';
-  final markersSnapshot = FirebaseFirestore.instance.collection('markers')
-      .get();
+  String message = '';
+
+  static const platform = const MethodChannel('com.example.volumeButtonHandler');
+  int volumeDownCount = 0;
+
 
   @override
   void initState() {
     super.initState();
+    enableVolumeButtonHandler();
     logoutTimer = Timer(Duration.zero, handleLogout);
     logoutTimerStart();
     fetchMarkersFromFirestore();
@@ -49,21 +53,37 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         .loadString('assets/maptheme/silver.json')
         .then((string) {
       mapTheme = string;
-      print(mapTheme);
     }).catchError((error) {
-      print('here');
       log(error.toString());
     });
   }
 
-  Future logoutTimerStart() async {
-    const inactivityDuration = Duration(hours: 72);
+  @override
+  void dispose() {
+    logoutTimer.cancel();
+    super.dispose();
+  }
 
-    if (logoutTimer != null) {
-      logoutTimer.cancel();
+  Future<void> enableVolumeButtonHandler() async {
+    try {
+      await platform.invokeMethod('enableVolumeButtonHandler');
+    } on PlatformException catch (e) {
+      print("Failed to enable volume button handler: ${e.message}");
     }
+  }
 
-    logoutTimer = Timer(inactivityDuration, handleLogout);
+  Future<void> handleVolumeButtonPress() async {
+    volumeDownCount++;
+    if (volumeDownCount == 3) {
+      _sendSMS(smsTextLocation(message, _currentPosition),recipents);
+      print("Volume down button pressed three times");
+    }
+  }
+
+  Future logoutTimerStart() async {
+    const inactivity = Duration(hours: 72);
+    logoutTimer.cancel();
+    logoutTimer = Timer(inactivity, handleLogout);
   }
 
   void resetLogoutTimer() {
@@ -78,7 +98,9 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       await FirebaseAuth.instance.signOut();
       Navigator.pushReplacementNamed(context, 'start_page');
     } catch (e) {
-      print('Error during logout: $e');
+      if (kDebugMode) {
+        print('Error during logout: $e');
+      }
     }
   }
 
@@ -106,54 +128,77 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   }
 
   void addMarker(LatLng position) async {
-    showDialog(context: context,
-        builder: (BuildContext context) {
-          String selectedCategory;
-          return AlertDialog(
-            title: Text('Choose one of the following categories'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  ListTile(
-                    title: Text('Category 1'),
-                    onTap: () {
-                      selectedCategory = 'Category 1';
-                      Navigator.of(context).pop(selectedCategory);
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Category 2'),
-                    onTap: () {
-                      selectedCategory = 'Category 2';
-                      Navigator.of(context).pop(selectedCategory);
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Category 3'),
-                    onTap: () {
-                      selectedCategory = 'Category 3';
-                      Navigator.of(context).pop(selectedCategory);
-                    },
-                  ),
-                ],
-              )
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String? selectedCategory;
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return AlertDialog(
+              title: Text('Choose one of the following categories'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    RadioListTile(
+                      title: Text('Unsafe physical spaces'),
+                      subtitle: Text('Poor lighting/Lack of Surveillance'),
+                      value: 'Unsafe physical spaces',
+                      groupValue: selectedCategory,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                      },
+                    ),
+                    RadioListTile(
+                      title: Text('Verbal or psychological harassment'),
+                      subtitle: Text('Catcalling/Verbal Threats/Hate Speech/Stalking'),
+                      value: 'Verbal or psychological harassment',
+                      groupValue: selectedCategory,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                      },
+                    ),
+                    RadioListTile(
+                      title: Text('Physical harassment'),
+                      subtitle: Text('Assault/Robbery/Sexual harassment'),
+                      value: 'Physical harassment',
+                      groupValue: selectedCategory,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ],
-          );
-        },
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop(selectedCategory);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
     ).then((selectedCategory) async {
       if (selectedCategory != null) {
         final newMarker = Marker(
           markerId: MarkerId(position.toString()),
           position: position,
-          icon: BitmapDescriptor.defaultMarker,
+          icon: selectedItem(selectedCategory),
           infoWindow: InfoWindow(title: selectedCategory),
         );
 
@@ -173,6 +218,15 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   }
 
 
+  BitmapDescriptor selectedItem(String category){
+    if(category == 'Unsafe physical spaces'){
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
+    }else if(category == 'Verbal or psychological harassment'){
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+    }else
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+  }
+
   Future<void> saveMarkerToFirestore(Marker marker, String category) async {
     final markerData = {
       'lat': marker.position.latitude,
@@ -189,7 +243,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     }
   }
 
-  void fetchMarkersFromFirestore() async {
+  Future<void> fetchMarkersFromFirestore() async {
     final markersSnapshot =
     await FirebaseFirestore.instance.collection('markers').get();
 
@@ -198,11 +252,14 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     markersSnapshot.docs.forEach((doc) {
       double latitude = doc['lat'];
       double longitude = doc['long'];
+      String category = doc['category'];
 
       markers.add(
         Marker(
           markerId: MarkerId(doc.id),
           position: LatLng(latitude, longitude),
+          infoWindow: InfoWindow(title: category),
+          icon: selectedItem(category),
         ),
       );
     });
@@ -210,6 +267,41 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     setState(() {
       _markersList = markers;
     });
+  }
+
+  void _handleMarkerDeleted(String markerId) {
+    setState(() {
+      // Remove the marker from the _markers set based on the markerId
+      _markersList.where((marker) => marker.markerId.value != markerId).toSet();
+    });
+  }
+
+  String smsTextLocation(String message, LocationData locationData){
+    message = 'Hello, I feel I could be in possible danger, this is my current location: https://www.google.com/maps/place/${locationData.latitude},${locationData.longitude}';
+    return message;
+  }
+
+  Future<List<String>> getRecipients() async {
+    List<String> contacts = [];
+
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('emergency_number')
+        .get();
+
+    snapshot.docs.forEach((doc) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+      if (data != null && data.containsKey('phone')) {
+        contacts.add(data['phone'].toString());
+      }
+    });
+
+    return contacts;
+  }
+
+  Future<void> _sendSMS(String message, List<String> recipents) async {
+    recipents = await getRecipients();
+    await sendSMS(message: message, recipients: recipents);
   }
 
   @override
@@ -230,14 +322,16 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
             color: Colors.white,
             onPressed: () {
               // _sendLocationSMS();
-              print('sent location');
+              _sendSMS(smsTextLocation(message, _currentPosition),recipents);
             },
             icon: const Icon(Icons.sos),
           ),
         ),
-        body: GoogleMap(
+        body: Stack(
+        children:  [
+          GoogleMap(
           onMapCreated: _onMapCreated,
-          markers: Set<Marker>.of(_markersList),
+          markers: Set<Marker>.from(_markersList),
           onTap: (LatLng position) {
             addMarker(position);
           },
@@ -245,6 +339,20 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
               target: _initialcameraposition, zoom: 15),
           myLocationEnabled: true,
           zoomControlsEnabled: true,
+         ),
+          Positioned(
+              child: FloatingActionButton(
+                onPressed: fetchMarkersFromFirestore,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.refresh,
+                  color: Colors.black,
+                ),
+              ),
+            top: 16,
+            left: 16,
+          ),
+        ],
         ),
         bottomNavigationBar: BottomAppBar(
           notchMargin: 3.0,
@@ -338,55 +446,6 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       });
     });
 
-    @override
-    void dispose() {
-      logoutTimer.cancel();
-      super.dispose();
-    }
-
-    Future<LocationData?> getLiveLocation() async {
-      Location location = Location();
-      bool _serviceEnabled;
-      PermissionStatus _permissionGranted;
-
-      // Check if location services are enabled
-      _serviceEnabled = await location.serviceEnabled();
-      if (!_serviceEnabled) {
-        _serviceEnabled = await location.requestService();
-        if (!_serviceEnabled) {
-          return null;
-        }
-      }
-
-      // Check if location permission is granted
-      _permissionGranted = await location.hasPermission();
-      if (_permissionGranted == PermissionStatus.denied) {
-        _permissionGranted = await location.requestPermission();
-        if (_permissionGranted != PermissionStatus.granted) {
-          return null;
-        }
-      }
-      _liveLocation = await location.getLocation();
-      return _liveLocation;
-    }
-
-    // void sendLocationSMS(String phoneNumber, LocationData locationData) {
-    //   SmsSender sender = SmsSender();
-    //   String message = 'My current location: https://www.google.com/maps/place/${locationData.latitude},${locationData.longitude}';
-    //   SmsMessage smsMessage = SmsMessage(phoneNumber, message);
-    //
-    //   sender.sendSms(smsMessage);
-    // }
-
-    // Future<void> _sendLocationSMS() async {
-    //   LocationData? locationData = await getLiveLocation();
-    //   if (locationData != null) {
-    //     sendLocationSMS('0755186487', locationData);
-    //   } else {
-    //     // Handle the case where the location data is null
-    //     print('Unable to retrieve location data');
-    //   }
-    // }
 
   }
 }

@@ -1,18 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:woman_safety_app/Pages/Cards/emergencyContactCard.dart';
 
-import '../Model/EmergencyNumber.dart';
-import 'MapHomePage.dart';
-import 'StartPage.dart';
-import 'flutter_flow/flutter_flow_icon_button.dart';
-import 'flutter_flow/flutter_flow_theme.dart';
-import 'flutter_flow/flutter_flow_util.dart';
-import 'flutter_flow/flutter_flow_widgets.dart';
+import '../../Model/EmergencyNumber.dart';
+import '../flutter_flow/flutter_flow_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class EmergencyContactsPageWidget extends StatefulWidget {
@@ -23,19 +15,26 @@ class EmergencyContactsPageWidget extends StatefulWidget {
 }
 
 class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidget> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
-  late EmergencyNumber emergencyNumber = EmergencyNumber();
+  late EmergencyNumber emergencyNumber = EmergencyNumber(name: '', phone: '');
   final CollectionReference collectionRef =
   FirebaseFirestore.instance.collection('users')
       .doc(FirebaseAuth.instance.currentUser?.uid)
       .collection('emergency_number');
-  bool isDescending = false;
+  List<DocumentSnapshot> items = [];
+  bool ascendingOrder = true;
+
 
   @override
   void initState() {
     super.initState();
+    fetchItems().then((docs) {
+      setState(() {
+        items = docs;
+      });
+    });
   }
 
   @override
@@ -49,6 +48,25 @@ class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidge
   void didChangeDependencies(){
     super.didChangeDependencies();
   }
+
+  Future<List<DocumentSnapshot>> fetchItems() async {
+    final QuerySnapshot snapshot = await collectionRef
+        .get();
+
+    return snapshot.docs;
+  }
+
+  void sortItems() {
+    setState(() {
+      if (ascendingOrder) {
+        items.sort((a, b) => a['name'].compareTo(b['name']));
+      } else {
+        items.sort((a, b) => b['name'].compareTo(a['name']));
+      }
+      ascendingOrder = !ascendingOrder;
+    });
+  }
+
 
   Future<void> editContact([DocumentSnapshot? documentSnapshot]) async {
     if(documentSnapshot != null){
@@ -147,10 +165,46 @@ class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidge
   }
 
   Future<void> deleteContact(String contactId) async {
+    DocumentSnapshot? deletedContact;
+    int deletedContactIndex = -1;
+
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].id == contactId) {
+        deletedContact = items[i];
+        deletedContactIndex = i;
+        break;
+      }
+    }
+
+    if (deletedContact == null || deletedContactIndex == -1) return;
+
     await collectionRef.doc(contactId).delete();
 
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('You have successfully deleted a contact')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Contact deleted'),
+        duration: const Duration(seconds: 10),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () async {
+            await collectionRef.add({
+              'name': deletedContact!['name'],
+              'phone': deletedContact['phone'],
+              'created': DateTime.now(),
+            });
+            fetchItems().then((docs) {
+              setState(() {
+                items = docs;
+              });
+            });
+          },
+        ),
+      ),
+    );
+
+    setState(() {
+      items.removeAt(deletedContactIndex);
+    });
   }
   
   Future sort() async{
@@ -203,62 +257,56 @@ class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidge
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextButton.icon(
-              onPressed: () {
-                setState(() =>
-                isDescending = !isDescending);
-                sort();
-              },
+              onPressed: sortItems,
               icon: RotatedBox(
                 quarterTurns: 1,
                 child: Icon(Icons.compare_arrows, size: 26,),
               ),
               label: Text(
-                isDescending ? 'Descending' : 'Ascending'
+                ascendingOrder ? 'Sort A-Z' : 'Sort Z-A'
               ),
             ),
             SizedBox(height: 16),
-        Expanded(
-            child:StreamBuilder(
-              stream: collectionRef.snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot){
-                if(streamSnapshot.hasData){
-                  return ListView.builder(
-                    itemCount: streamSnapshot.data!.docs.length,
-                    itemBuilder: (context, index){
-                      final DocumentSnapshot documentSnapshot =
-                      streamSnapshot.data!.docs[index];
-                      return Card(
-                        margin: const EdgeInsets.all(10),
-                        child: ListTile(
-                          title: Text(documentSnapshot['name']),
-                          subtitle: Text(documentSnapshot['phone']),
-                          trailing: SizedBox(
-                            width: 100,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                    onPressed: () => editContact(documentSnapshot),
-                                    icon: const Icon(Icons.edit)),
-                                IconButton(
-                                    onPressed: () => deleteContact(documentSnapshot.id),
-                                    icon: const Icon(Icons.delete))
-                              ],
-
-                            ),
-                          ),
-                        ),
-                      );
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final DocumentSnapshot documentSnapshot = items[index];
+                  return Dismissible(
+                    key: Key(documentSnapshot.id),
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.only(right: 16.0),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onDismissed: (direction) {
+                      deleteContact(documentSnapshot.id);
                     },
+                    child: Card(
+                      margin: const EdgeInsets.all(10),
+                      child: ListTile(
+                        title: Text(documentSnapshot['name']),
+                        subtitle: Text(documentSnapshot['phone']),
+                        trailing: IconButton(
+                          onPressed: () => editContact(documentSnapshot),
+                          icon: const Icon(Icons.edit),
+                        ),
+                      ),
+                    ),
                   );
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
+                },
+                scrollDirection: Axis.vertical,
+              ),
             ),
-        ),
+            SizedBox(height: 100),
       ],
       ),
+
           floatingActionButton: FloatingActionButton(
             onPressed: () => addContact(),
             child: const Icon(Icons.add),
