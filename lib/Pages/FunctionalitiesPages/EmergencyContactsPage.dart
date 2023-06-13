@@ -56,6 +56,48 @@ class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidge
     return snapshot.docs;
   }
 
+  bool isValidPhoneNumber(String phone) {
+    String pattern = r'^(?:\+40|0)[ ]?7\d{2}[ ]?\d{3}[ ]?\d{3}$';
+    RegExp regExp = new RegExp(pattern);
+    return regExp.hasMatch(phone);
+  }
+
+  Future errorMessage(String message)
+  async {
+    return await showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+              title: Text(message,
+                selectionColor: CupertinoColors.systemGrey,
+                style: const TextStyle(color: Colors.grey, fontFamily: 'Lexend Deca', fontSize: 15),
+              ),
+              backgroundColor: Colors.white,
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ]
+          ),
+    );
+  }
+  
+  bool phoneConfirmed()
+  {
+    if(phoneController.text.isEmpty)
+    {
+      errorMessage("Please write your phone number!");
+      return false;
+    }
+    if(isValidPhoneNumber(phoneController.text) == false)
+    {
+      errorMessage("Please write a valid phone number!");
+      return false;
+    }
+    else
+      return true;
+  }
   void sortItems() {
     setState(() {
       if (ascendingOrder) {
@@ -150,11 +192,14 @@ class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidge
                   onPressed: () async {
                     final String name = nameController.text;
                     final String phone = phoneController.text;
-                    await collectionRef.add({"name": name, "phone": phone,'created': DateTime.now()});
+                    if (phoneConfirmed()){
+                          await collectionRef
+                              .add({"name": name, "phone": phone,'created': DateTime.now()});
 
                     nameController.text = '';
                     phoneController.text = '';
                     Navigator.of(context).pop();
+                    } else errorMessage("Incorect number format");
                   },
                 )
               ],
@@ -248,7 +293,16 @@ class _EmergencyContactsPageWidgetState extends State<EmergencyContactsPageWidge
       ),
       ],
       ),
-      actions: [],
+      actions: [
+        IconButton(
+          icon: Icon(Icons.refresh),
+          color: Colors.black,
+          onPressed: () {
+            setState(() {
+            });
+          },
+        ),
+      ],
       centerTitle: true,
       elevation: 0,
       ),

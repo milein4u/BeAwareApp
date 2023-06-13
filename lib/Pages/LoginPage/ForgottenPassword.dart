@@ -21,6 +21,7 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final newPasswordController = TextEditingController();
   final emailController = TextEditingController();
+  late bool passwordVisibility;
 
   @override
   void dispose() {
@@ -82,14 +83,20 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    passwordVisibility = false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
         child: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           title: Column(
             mainAxisSize: MainAxisSize.max,
@@ -102,9 +109,9 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     IconButton(
-                      color: Colors.black,
-                      icon: Icon(Icons.arrow_back),
-                      iconSize: 38,
+                      color: Color(0xFF0B508C),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded),
+                      iconSize: 34,
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -122,163 +129,156 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
+          SizedBox(height: 40),
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(24, 4, 24, 0),
-            child: Container(
-                width: double.infinity,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 5,
-                      color: Color(0x4D101213),
-                      offset: Offset(0, 2),
-                    )
-                  ],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: TextFormField(
-                  controller: emailController,
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    labelText: 'Your email address...',
-                    labelStyle: FlutterFlowTheme.of(context).bodyText2,
-                    hintText: 'Your email address...',
-                    hintStyle: FlutterFlowTheme.of(context).bodyText1.override(
-                      fontFamily: 'Lexend Deca',
-                      color: FlutterFlowTheme.of(context).secondaryText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
+            padding: EdgeInsetsDirectional.fromSTEB(80, 0, 0, 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: const [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+                    child: Text(
+                      'FORGOTTEN PASSWORD',
+                      style: TextStyle(
+                        color: Color(0xFF0B508C),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        fontFamily: "Poppins",
                       ),
-                      borderRadius: BorderRadius.circular(12),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                    contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
                   ),
-                  style: FlutterFlowTheme.of(context).bodyText1,
-                  maxLines: 1,
-                )
+                ),
+              ],
             ),
           ),
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(24, 4, 24, 0),
             child: Container(
-                width: double.infinity,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 5,
-                      color: Color(0x4D101213),
-                      offset: Offset(0, 2),
-                    )
-                  ],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: TextFormField(
-                  controller: newPasswordController,
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    labelText: 'New password...',
-                    labelStyle: FlutterFlowTheme.of(context).bodyText2,
-                    hintText: 'New password...',
-                    hintStyle: FlutterFlowTheme.of(context).bodyText1.override(
-                      fontFamily: 'Lexend Deca',
-                      color: FlutterFlowTheme.of(context).secondaryText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0x00000000),
-                        width: 0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                    contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+              width: double.infinity,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Color(0xFFB3E7F2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextFormField(
+                controller: emailController,
+                obscureText: false,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                      Icons.email,
+                      color: Color(0xFF0B508C),
+                      size:22
                   ),
-                  style: FlutterFlowTheme.of(context).bodyText1,
-                  maxLines: 1,
-                )
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(20, 44, 9, 0),
-            child: FFButtonWidget(
-              onPressed: () {
-                passwordReset();
-              },
-              text: 'Reset Password',
-              options: FFButtonOptions(
-                width: 230,
-                height: 50,
-                color: FlutterFlowTheme.of(context).primaryBackground,
-                textStyle: FlutterFlowTheme.of(context).subtitle2.override(
-                  fontFamily: 'Poppins',
-                  color: FlutterFlowTheme.of(context).secondaryText,
+                  hintText: 'Enter your email',
+                  hintStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Color(0xFF0B508C),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0x00000000),
+                      width: 0,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(
+                      color: Color(0x00000000),
+                      width: 0,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Color(0xFFB3E7F2),
+                  contentPadding:
+                  EdgeInsetsDirectional.fromSTEB(2, 24, 2, 24),
                 ),
-                elevation: 0,
-                borderSide: const BorderSide(
-                  color: Colors.transparent,
-                  width: 1,
-                ),
+                maxLines: 1,
+                validator:
+                    (value) => (value!.isEmpty)
+                    ? 'Please enter email'
+                    : null,
               ),
             ),
           ),
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(24, 12, 24, 0),
+            child: Container(
+              width: double.infinity,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Color(0xFFB3E7F2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextFormField(
+                controller: newPasswordController,
+                obscureText: !passwordVisibility,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                      Icons.lock,
+                      color: Color(0xFF0B508C),
+                      size:22
+                  ),
+                  hintText: 'Enter your password',
+                  hintStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Color(0xFF0B508C),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0x00000000),
+                      width: 0,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(
+                      color: Color(0x00000000),
+                      width: 0,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Color(0xFFB3E7F2),
+                  contentPadding:
+                  EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                  suffixIcon: InkWell(
+                    focusNode: FocusNode(skipTraversal: true),
+                    child: Icon(
+                      Icons.visibility_off_outlined,
+                      color: Color(0xFF0B508C),
+                      size: 22,
+                    ),
+                  ),
+                ),
+                maxLines: 1,
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          MaterialButton(
+            minWidth: 240,
+            color: Colors.white,
+            height: 60,
+            elevation: 0,
+            onPressed: () {
+              passwordReset();
+            },
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50)
+            ),
+            child: const Text("Reset password", style: TextStyle(
+                color: Color(0xFF0B508C),
+                fontWeight: FontWeight.w600,
+                fontFamily: "Poppins",
+                fontSize: 16
+            ),),
+          )
         ],
       ),
     );

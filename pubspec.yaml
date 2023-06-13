@@ -57,6 +57,7 @@ dependencies:
   geocoding: ^2.0.1
   flutter_sms:
   dcdg: ^3.0.0
+  simple_animations: ^1.3.3
 
   firebase_core:
   firebase_auth: ^4.1.4
@@ -97,6 +98,7 @@ flutter:
      - assets/maptheme/silver.json
      - assets/markers/custom_marker_blue.png
      - assets/images/welcome_logo.png
+     - assets/images/welcome_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

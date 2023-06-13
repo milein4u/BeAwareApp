@@ -185,7 +185,27 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                 TextButton(
                   child: Text('OK'),
                   onPressed: () {
-                    Navigator.of(context).pop(selectedCategory);
+                    if (selectedCategory != null) {
+                      Navigator.of(context).pop(selectedCategory);
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('Please choose one of the categories.'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                 ),
               ],
@@ -218,11 +238,12 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   }
 
 
+
   BitmapDescriptor selectedItem(String category){
     if(category == 'Unsafe physical spaces'){
-      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
     }else if(category == 'Verbal or psychological harassment'){
-      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
     }else
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
   }
@@ -312,8 +333,18 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Color(0xFFEFEFEF),
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(0),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
+            actions: [],
+            centerTitle: true,
+            elevation: 0,
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton.large(
           onPressed: () {},
@@ -349,7 +380,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                   color: Colors.black,
                 ),
               ),
-            top: 16,
+            top: 10,
             left: 16,
           ),
         ],
@@ -357,7 +388,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
         bottomNavigationBar: BottomAppBar(
           notchMargin: 3.0,
           shape: const CircularNotchedRectangle(),
-          color: Colors.indigoAccent,
+          color: Color(0xFF0B508C),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.max,

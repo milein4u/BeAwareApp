@@ -204,418 +204,304 @@ class _SignupWidgetState extends State<SignupWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
-      preferredSize: Size.fromHeight(100),
-      child: AppBar(
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        automaticallyImplyLeading: false,
-        title: Column(
+      preferredSize: Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          title: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    IconButton(
+                      color: Color(0xFF0B508C),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded),
+                      iconSize: 34,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [],
+          centerTitle: true,
+          elevation: 0,
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 20),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+              padding: EdgeInsetsDirectional.fromSTEB(100, 0, 0, 8),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
-                children: [
-                  IconButton(
-                    color: Colors.black,
-                    icon: Icon(Icons.arrow_back),
-                    iconSize: 38,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [],
-        centerTitle: true,
-        elevation: 0,
-      ),
-      ),
-      body: GestureDetector(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * 1,
-          decoration: BoxDecoration(),
-          child: Align(
-            alignment: AlignmentDirectional(0, 1),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 3,
-                          color: Color(0x24000000),
-                          offset: Offset(0, -1),
-                        )
-                      ],
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(0),
-                        bottomRight: Radius.circular(0),
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
+                children: const [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+                      child: Text(
+                        'GET STARTED',
+                        style: TextStyle(
+                          color: Color(0xFF0B508C),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                          fontFamily: "Poppins",
+                        ),
                       ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding:
-                          EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Get Started',
-                                  style: FlutterFlowTheme.of(context).title1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                          EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: emailAddressController,
-                                  validator: (value) =>
-                                  (value!.isEmpty)
-                                      ? 'Please enter email'
-                                      : null,
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'Email Address',
-                                    labelStyle:
-                                    FlutterFlowTheme.of(context).subtitle2,
-                                    hintText: 'Enter your email here...',
-                                    hintStyle:
-                                    FlutterFlowTheme.of(context).bodyText2,
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    contentPadding:
-                                    EdgeInsetsDirectional.fromSTEB(
-                                        16, 24, 0, 24),
-                                  ),
-                                  style: FlutterFlowTheme.of(context).subtitle1,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                          EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: phoneController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Phone number',
-                                    labelStyle:
-                                    FlutterFlowTheme.of(context).subtitle2,
-                                    hintText: 'Enter your phone number...',
-                                    hintStyle:
-                                    FlutterFlowTheme.of(context).bodyText2,
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    contentPadding:
-                                    EdgeInsetsDirectional.fromSTEB(
-                                        16, 24, 0, 24),
-                                  ),
-                                  style: FlutterFlowTheme.of(context).subtitle1,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                          EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: passwordController,
-                                  validator: (value) =>
-                                  (value!.isEmpty)
-                                      ? 'Please enter password'
-                                      : null,
-                                  obscureText: !passwordVisibility,
-                                  decoration: InputDecoration(
-                                    labelText: 'Password',
-                                    labelStyle:
-                                    FlutterFlowTheme.of(context).subtitle2,
-                                    hintText: 'Enter your password here...',
-                                    hintStyle:
-                                    FlutterFlowTheme.of(context).bodyText2,
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    contentPadding:
-                                    EdgeInsetsDirectional.fromSTEB(
-                                        16, 24, 0, 24),
-                                    suffixIcon: InkWell(
-                                      onTap: () => setState(
-                                            () => passwordVisibility =
-                                        !passwordVisibility,
-                                      ),
-                                      focusNode: FocusNode(skipTraversal: true),
-                                      child: Icon(
-                                        passwordVisibility
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        color: Color(0xFF95A1AC),
-                                        size: 22,
-                                      ),
-                                    ),
-                                  ),
-                                  style: FlutterFlowTheme.of(context).subtitle1,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                          EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: confirmPasswordController,
-                                  obscureText: !confirmPasswordVisibility,
-                                  decoration: InputDecoration(
-                                    labelText: 'Confirm Password',
-                                    labelStyle:
-                                    FlutterFlowTheme.of(context).subtitle2,
-                                    hintText: 'Enter your password again...',
-                                    hintStyle:
-                                    FlutterFlowTheme.of(context).bodyText2,
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    contentPadding:
-                                    EdgeInsetsDirectional.fromSTEB(
-                                        16, 24, 0, 24),
-                                    suffixIcon: InkWell(
-                                      onTap: () => setState(
-                                            () => confirmPasswordVisibility =
-                                        !confirmPasswordVisibility,
-                                      ),
-                                      focusNode: FocusNode(skipTraversal: true),
-                                      child: Icon(
-                                        confirmPasswordVisibility
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        color: Color(0xFF95A1AC),
-                                        size: 22,
-                                      ),
-                                    ),
-                                  ),
-                                  style: FlutterFlowTheme.of(context).subtitle1,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                          EdgeInsetsDirectional.fromSTEB(20, 12, 20, 16),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              FFButtonWidget(
-                                onPressed: () { register();},
-                                text: 'Create Account',
-                                options: FFButtonOptions(
-                                  width: 180,
-                                  height: 50,
-                                  color: Colors.black,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .subtitle2
-                                      .override(
-                                    fontFamily: 'Outfit',
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  elevation: 2,
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          height: 2,
-                          thickness: 2,
-                          indent: 20,
-                          endIndent: 20,
-                          color: FlutterFlowTheme.of(context).lineColor,
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
             ),
-          ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(24, 8, 24, 0),
+              child: Container(
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Color(0xFFB3E7F2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextFormField(
+                  controller: emailAddressController,
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                        Icons.email,
+                        color: Color(0xFF0B508C),
+                        size:22
+                    ),
+                    hintText: 'Enter your email',
+                    hintStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Color(0xFF0B508C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Color(0xFFB3E7F2),
+                    contentPadding:
+                    EdgeInsetsDirectional.fromSTEB(2, 24, 2, 24),
+                  ),
+                  maxLines: 1,
+                  validator:
+                      (value) => (value!.isEmpty)
+                      ? 'Please enter email'
+                      : null,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(24, 8, 24, 0),
+              child: Container(
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Color(0xFFB3E7F2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextFormField(
+                  controller: phoneController,
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                        Icons.phone,
+                        color: Color(0xFF0B508C),
+                        size:22
+                    ),
+                    hintText: 'Enter your phone number',
+                    hintStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Color(0xFF0B508C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Color(0xFFB3E7F2),
+                    contentPadding:
+                    EdgeInsetsDirectional.fromSTEB(2, 24, 2, 24),
+                  ),
+                  maxLines: 1,
+                  validator:
+                      (value) => (value!.isEmpty)
+                      ? 'Please enter phone number'
+                      : null,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(24, 8, 24, 0),
+              child: Container(
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Color(0xFFB3E7F2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextFormField(
+                  controller: passwordController,
+                  obscureText: !passwordVisibility,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                        Icons.lock,
+                        color: Color(0xFF0B508C),
+                        size:22
+                    ),
+                    hintText: 'Enter your password',
+                    hintStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Color(0xFF0B508C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Color(0xFFB3E7F2),
+                    contentPadding:
+                    EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                    suffixIcon: InkWell(
+                      focusNode: FocusNode(skipTraversal: true),
+                      child: Icon(
+                        Icons.visibility_off_outlined,
+                        color: Color(0xFF0B508C),
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(24, 8, 24, 0),
+              child: Container(
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Color(0xFFB3E7F2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextFormField(
+                  controller: confirmPasswordController,
+                  obscureText: !confirmPasswordVisibility,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                        Icons.lock,
+                        color: Color(0xFF0B508C),
+                        size:22
+                    ),
+                    hintText: 'Enter your password',
+                    hintStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Color(0xFF0B508C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Color(0x00000000),
+                        width: 0,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Color(0xFFB3E7F2),
+                    contentPadding:
+                    EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                    suffixIcon: InkWell(
+                      focusNode: FocusNode(skipTraversal: true),
+                      child: Icon(
+                        Icons.visibility_off_outlined,
+                        color: Color(0xFF0B508C),
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 24, 0, 0),
+                child: MaterialButton(
+                  minWidth: 200,
+                  height: 50,
+                  color: Color(0xFF0B508C),
+                  elevation: 0,
+                  onPressed: () { register();},
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50)
+                  ),
+                  child: const Text("Register", style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Poppins",
+                      fontSize: 18
+                  ),),
+                )
+            ),
+          ],
         ),
       ),
     );
