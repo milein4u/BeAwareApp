@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 
 class AnimationEffect extends StatelessWidget {
-  late final double delay;
-  late final Widget child;
+  final double delay;
+  final Widget child;
 
-  AnimationEffect(this.delay, this.child);
+  const AnimationEffect(this.delay, this.child, {super.key});
 
   @override
   Widget build(BuildContext context) {
     final tween = MultiTrackTween([
-      Track("opacity").add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
+      Track("opacity").add(const Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
       Track("translateY").add(
-          Duration(milliseconds: 500), Tween(begin: -30.0, end: 0.0),
+          const Duration(milliseconds: 500), Tween(begin: -30.0, end: 0.0),
           curve: Curves.easeOut)
     ]);
 

@@ -59,6 +59,7 @@ dependencies:
   dcdg: ^3.0.0
   simple_animations: ^1.3.3
   dio: ^4.0.4
+  crypto:
 
   firebase_core:
   firebase_auth: ^4.1.4

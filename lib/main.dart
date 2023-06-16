@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:woman_safety_app/Pages/MainPages/MapHomePage.dart';
-import 'package:woman_safety_app/Pages/MainPages/StartPage.dart';
-import 'package:dcdg/dcdg.dart';
-import 'Pages/LoginPage/Login.dart';
-import 'Pages/SignupPage/Signup.dart';
+import 'package:woman_safety_app/Pages/MainPages/map_home_page.dart';
+import 'package:woman_safety_app/Pages/MainPages/start_page.dart';
+import 'Pages/LoginPage/login.dart';
+import 'Pages/SignupPage/signup.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -23,19 +22,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'BeAware',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-
-      home:  StreamBuilder(
+      home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (ctx, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
@@ -45,19 +34,13 @@ class MyApp extends StatelessWidget {
               return const StartPageWidget();
             }
             return const StartPageWidget();
-          }
-      ),
-
-
+          }),
       routes: {
-        'start_page': (context) => StartPageWidget(),
-        'login_screen': (context) => LoginWidget(),
-        'signup_screen': (context) => SignupWidget(),
-        'map_screen': (context) => MapHomePageWidget(),
+        'start_page': (context) => const StartPageWidget(),
+        'login_screen': (context) => const LoginWidget(),
+        'signup_screen': (context) => const SignupWidget(),
+        'map_screen': (context) => const MapHomePageWidget(),
       },
-
-
-
     );
   }
 }
