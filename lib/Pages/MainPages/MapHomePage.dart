@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -36,6 +38,9 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   LatLng _initialcameraposition = LatLng(45.760696, 21.226788);
   String mapTheme = '';
   String message = '';
+  String address = "";
+  String dateTime = "";
+  String key = "AIzaSyAY8euc6uR3PwJ-UdfIv7R1rINBiXsiT4Y";
 
   static const platform = const MethodChannel('com.example.volumeButtonHandler');
   int volumeDownCount = 0;
@@ -238,14 +243,43 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   }
 
 
-
   BitmapDescriptor selectedItem(String category){
     if(category == 'Unsafe physical spaces'){
-      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
-    }else if(category == 'Verbal or psychological harassment'){
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+    }else if(category == 'Verbal or psychological harassment'){
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
     }else
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+  }
+
+  Future<String> convertToAddress(double lat, double long, String apikey) async {
+    Dio dio = Dio();  //initilize dio package
+    String apiurl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$apikey";
+
+    Response response = await dio.get(apiurl); //send get request to API URL
+
+    if(response.statusCode == 200){ //if connection is successful
+      Map data = response.data; //get response data
+      if(data["status"] == "OK"){ //if status is "OK" returned from REST API
+        if(data["results"].length > 0){ //if there is atleast one address
+          Map firstresult = data["results"][0]; //select the first address
+
+          address = firstresult["formatted_address"]; //get the address
+        }
+      }else{
+        print(data["error_message"]);
+      }
+    }else{
+      print("error while fetching geoconding data");
+    }
+
+    return address;
+  }
+
+  String dateTimeDisplay(){
+
+    dateTime = "${DateTime.now().day}-${DateTime.now().month} ${DateTime.now().hour}:${DateTime.now().minute}";
+    return dateTime;
   }
 
   Future<void> saveMarkerToFirestore(Marker marker, String category) async {
@@ -254,6 +288,8 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       'long': marker.position.longitude,
       'marker_uid': FirebaseAuth.instance.currentUser?.uid,
       'category': category,
+      'address': await convertToAddress(marker.position.latitude, marker.position.longitude, key),
+      'time': dateTimeDisplay(),
     };
 
     try {

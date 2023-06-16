@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:woman_safety_app/Pages/FunctionalitiesPages/AllHistoryPage.dart';
 import 'package:woman_safety_app/Pages/flutter_flow/flutter_flow_theme.dart';
+
+import '../MainPages/MapHomePage.dart';
 
 
 typedef MarkerDeletedCallback = void Function(DocumentSnapshot markerId);
@@ -36,6 +39,15 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
         .where("marker_uid", isEqualTo: userId.toString())
         .get();
     return snapshot.docs;
+  }
+  
+  int selectedColor(String category){
+    if(category == 'Unsafe physical spaces'){
+      return 0xFF34A6BF;
+    }else if(category == 'Verbal or psychological harassment'){
+      return 0xFFF28705;
+    }else
+      return 0xFFBF491F;
   }
 
   Future<void> deleteMarker(String markerId) async {
@@ -88,32 +100,53 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
     return Scaffold(
       key: scaffoldKey,
       resizeToAvoidBottomInset: true,
-      backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100),
+        preferredSize: Size.fromHeight(60),
         child: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: Color(0xFF0B508C),
           automaticallyImplyLeading: false,
           title: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    IconButton(
-                      color: Colors.black,
-                      icon: Icon(Icons.arrow_back),
-                      iconSize: 38,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+              Row(
+                children: <Widget>[
+                  IconButton(
+                    color: Colors.white,
+                    icon: Icon(Icons.arrow_back_ios_new_rounded),
+                    iconSize: 34,
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return const MapHomePageWidget();
+                      }));
+                    },
+                  ),
+                  Expanded(
+                    child: TextButton(
+                      child: const Text('Your markers',
+                         style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ), onPressed: () {  },
                     ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                      child: TextButton(
+                        child: const Text('All markers',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            return AllHistoryPageWidget();
+                          }));
+                          },
+                      ),
+                  )
+                ],
               ),
             ],
           ),
@@ -125,6 +158,7 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: 20),
           Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(8),
@@ -159,15 +193,41 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
                       deleteMarker(documentSnapshot.id);
                     },
                     background: Container(
-                      color: Colors.red,
-                      child: Icon(Icons.delete),
+                      color: Colors.redAccent,
+                      child: Icon(Icons.delete,
+                        color: Colors.white),
                       alignment: Alignment.centerRight,
-                      padding: EdgeInsets.only(right: 16.0),
+                      padding: EdgeInsets.only(right: 20.0),
                     ),
                     child: Card(
-                      margin: const EdgeInsets.all(10),
+                      margin: const EdgeInsetsDirectional.fromSTEB(5, 5, 5, 5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      color: Color(selectedColor(documentSnapshot['category'])),
                       child: ListTile(
-                        title: Text(documentSnapshot['category']),
+                        trailing: Text(documentSnapshot['time'].toString(), style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "Poppins",
+                          fontSize: 12
+                      ),
+                      ),
+                        title: Text(documentSnapshot['category'],
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "Poppins",
+                            fontSize: 18
+                          ),
+                        ),
+                        subtitle: Text(documentSnapshot['address'], style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "Poppins",
+                            fontSize: 12
+                         ),
+                        ),
                       ),
                     ),
                   );
