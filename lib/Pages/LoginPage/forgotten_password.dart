@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ForgottenPasswordWidget extends StatefulWidget {
@@ -15,16 +16,21 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final newPasswordController = TextEditingController();
   final emailController = TextEditingController();
+  TextEditingController? confirmPasswordController;
   late bool passwordVisibility;
+  late bool confirmPasswordVisibility;
 
   @override
   void initState() {
     super.initState();
+    confirmPasswordController = TextEditingController();
+    confirmPasswordVisibility = false;
     passwordVisibility = false;
   }
 
   @override
   void dispose() {
+    confirmPasswordController?.dispose();
     newPasswordController.dispose();
     emailController.dispose();
     super.dispose();
@@ -34,43 +40,43 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
     String email = emailController.text;
     String newPassword = newPasswordController.text;
 
-    // Find the user document in Firestore using the email field
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      // Get the first document found (assuming unique email addresses)
-      String userId = querySnapshot.docs[0].id;
-      // Update the password field in Firestore
-      await FirebaseFirestore.instance
+    if(confirmedPassword()){
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userId)
-          .update({'password': hashPassword(newPassword)});
+          .where('email', isEqualTo: email)
+          .get();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.blueGrey,
-          content: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('Password updated succsefully!'),
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs[0].id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'password': hashPassword(newPassword)});
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.blueGrey,
+            content: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('Password updated succsefully!'),
+            ),
+            duration: Duration(seconds: 5),
           ),
-          duration: Duration(seconds: 5),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.blueGrey,
-          content: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('User not found!'),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.blueGrey,
+            content: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('User not found!'),
+            ),
+            duration: Duration(seconds: 5),
           ),
-          duration: Duration(seconds: 5),
-        ),
-      );
+        );
+      }
     }
+
   }
 
   String hashPassword(String password) {
@@ -79,6 +85,25 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
     String hashedPassword =
         sha256Result.toString(); // Convert the hashed result to a string
     return hashedPassword;
+  }
+
+  bool confirmedPassword() {
+    if (newPasswordController.text != confirmPasswordController?.text) {
+      if (kDebugMode) {
+        print(newPasswordController.text);
+        print(confirmPasswordController?.text);
+
+      }ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Passwords don\'t match!',
+          ),
+        ),
+      );
+      return false;
+    } else {
+      return true;
+    }
   }
 
   @override
@@ -186,7 +211,7 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
             ),
           ),
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(24, 12, 24, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(24, 8, 24, 0),
             child: Container(
               width: double.infinity,
               height: 60,
@@ -198,9 +223,9 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
                 controller: newPasswordController,
                 obscureText: !passwordVisibility,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock,
-                      color: Color(0xFF0B508C), size: 22),
-                  hintText: 'Enter your password',
+                  prefixIcon:
+                  const Icon(Icons.lock, color: Color(0xFF0B508C), size: 22),
+                  hintText: 'Type your password',
                   hintStyle: const TextStyle(
                     fontFamily: 'Poppins',
                     color: Color(0xFF0B508C),
@@ -224,7 +249,60 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
                   filled: true,
                   fillColor: const Color(0xFFB3E7F2),
                   contentPadding:
-                      const EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                  const EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                  suffixIcon: InkWell(
+                    focusNode: FocusNode(skipTraversal: true),
+                    child: const Icon(
+                      Icons.visibility_off_outlined,
+                      color: Color(0xFF0B508C),
+                      size: 22,
+                    ),
+                  ),
+                ),
+                maxLines: 1,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(24, 8, 24, 0),
+            child: Container(
+              width: double.infinity,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFFB3E7F2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextFormField(
+                controller: confirmPasswordController,
+                obscureText: !confirmPasswordVisibility,
+                decoration: InputDecoration(
+                  prefixIcon:
+                  const Icon(Icons.lock, color: Color(0xFF0B508C), size: 22),
+                  hintText: 'Retype your password',
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Color(0xFF0B508C),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0x00000000),
+                      width: 0,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(
+                      color: Color(0x00000000),
+                      width: 0,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFFB3E7F2),
+                  contentPadding:
+                  const EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
                   suffixIcon: InkWell(
                     focusNode: FocusNode(skipTraversal: true),
                     child: const Icon(

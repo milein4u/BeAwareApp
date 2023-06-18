@@ -1,3 +1,4 @@
+import '../../icons/custom_icons_icons.dart';
 import '../FunctionalitiesPages/emergency_contacts_page.dart';
 import '../FunctionalitiesPages/mark_history_page.dart';
 import 'dart:async';
@@ -153,15 +154,11 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     Response response = await dio.get(apiref); //send get request to API URL
 
     if (response.statusCode == 200) {
-      //if connection is successful
-      Map data = response.data; //get response data
+      Map data = response.data;
       if (data["status"] == "OK") {
-        //if status is "OK" returned from REST API
         if (data["results"].length > 0) {
-          //if there is at least one address
-          Map result = data["results"][0]; //select the first address
-
-          address = result["formatted_address"]; //get the address
+          Map result = data["results"][0];
+          address = result["formatted_address"];
         }
       } else {
         if (kDebugMode) {
@@ -403,7 +400,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
               // _sendLocationSMS();
               _sendSMS(smsTextLocation(message, _currentPosition), recipents);
             },
-            icon: const Icon(Icons.sos),
+            icon: const Icon(CustomIcons.welcome_logo),
           ),
         ),
         body: Stack(
@@ -465,7 +462,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
                           return const MarkHistoryPageWidget();
                         }));
                       },
-                      icon: const Icon(Icons.pin_drop_sharp),
+                      icon: const Icon(Icons.list),
                     ),
                     const Text(
                       "Mark history",
@@ -482,3 +479,5 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   }
 
 }
+
+

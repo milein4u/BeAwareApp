@@ -58,7 +58,9 @@ class _EmergencyContactsPageWidgetState
   }
 
   Future<List<DocumentSnapshot>> fetchItems() async {
-    final QuerySnapshot snapshot = await collectionRef.get();
+    final QuerySnapshot snapshot = await collectionRef
+        .orderBy("created", descending: true)
+        .get();
 
     return snapshot.docs;
   }
@@ -407,6 +409,7 @@ class _EmergencyContactsPageWidgetState
                       child: ListTile(
                         leading: const Icon(
                           Icons.person,
+                          color: Color(0xFF0B508C),
                           size: 36,
                         ),
                         title: Text(
