@@ -128,7 +128,11 @@ class _EmergencyContactsPageWidgetState
                       Navigator.of(context).pop();
                     } else {
                       errorMessage("Incorect number format");
-                    }
+                    }fetchItems().then((docs) {
+                      setState(() {
+                        items = docs;
+                      });
+                    });
                   },
                   child: const Text('Add'),
                 )
@@ -207,6 +211,11 @@ class _EmergencyContactsPageWidgetState
                     } else {
                       errorMessage("Incorect number format");
                     }
+                    fetchItems().then((docs) {
+                      setState(() {
+                        items = docs;
+                      });
+                    });
                   },
                   child: const Text('Update')
                 )
@@ -242,6 +251,8 @@ class _EmergencyContactsPageWidgetState
             await collectionRef.add({
               'name': deletedContact!['name'],
               'phone': deletedContact['phone'],
+              'created': deletedContact['created']
+
             });
             fetchItems().then((docs) {
               setState(() {
@@ -345,27 +356,6 @@ class _EmergencyContactsPageWidgetState
                         ),
                       ),
                     ),
-                    Expanded(
-                        child: TextButton.icon(
-                      onPressed: () {
-                        fetchItems().then((docs) {
-                          setState(() {
-                            items = docs;
-                          });
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.refresh,
-                        size: 26,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Refresh",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ))
                   ],
                 ),
               ],
