@@ -10,9 +10,17 @@ A new Flutter mobile app destined for street safety.
 
   The essential characteristic of this application is the “SOS ” functionality. When the user is in an uncertain situation, he can convey a predefined message to his emergency contacts within the application, which contains a Google Maps link to his exact location.
   
-	The purpose of the application is to create a safer environment for all users, based on constant and up-to-date transmission of information. The app uses the accessibility of mobile phones and digital maps to promote community involvement and foster a shared sense of responsibility for urban safety. By using this application, users can actively contribute to the overall safety of their environment, while having quick access to help when needed.
+  The purpose of the application is to create a safer environment for all users, based on constant and up-to-date transmission of information. The app uses the accessibility of mobile phones and digital maps to promote community involvement and foster a shared sense of responsibility for urban safety. By using this application, users can actively contribute to the overall safety of their environment, while having quick access to help when needed.
 
    With regard to the development of the application, as well as future directions, a functionality that can make its users more efficient and reliable is the input of a shortcut for the "SOS" button in cases where the use of the telon is not accessible at the time. Another functionality would be the introduction of notifications from the application to its users when a new marking was recently indicated in their surroundings.
+
+## How to install and Run the Project
+
+1. Install Android Studio(if you don't have it allready), here is a guide for this: https://developer.android.com/studio/install
+2. Install the Flutter and Dart plugins( if you don't have them allready), here is a guide for this: https://docs.flutter.dev/get-started/editor?tab=androidstudio
+3. Clone this repository, check these links if you have trouble doing this step: https://www.geeksforgeeks.org/how-to-clone-android-project-from-github-in-android-studio/
+https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
+   
 
 
 
