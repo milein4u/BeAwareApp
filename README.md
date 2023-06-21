@@ -1,16 +1,10 @@
-# woman_safety_app
+# BeAware Mobile App
 
-A new Flutter project.
+A new Flutter mobile app destined for street safety.
 
-## Getting Started
+## Project Description
 
-This project is a starting point for a Flutter application.
+The BeAware Mobile Application aims to increase safety in urban environments by encouraging user participation and real-time information exchange. By providing users with a platform to mark the points on the map, the application encourages community vigilance by drawing attention to potentially dangerous regions. It is easy for users to indicate risky locations, such as poorly lit streets, regions with high levels of crime or places with dangerous circumstances. By identifying these sites, users can work together to raise awareness and encourage others to be cautious. Users are free to check their list of markings and to remove them, if necessary. Reflecting the changing nature of the urban environment, this feature ensures that information is relevant and relevant.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
