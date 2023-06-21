@@ -18,8 +18,17 @@ A new Flutter mobile app destined for street safety.
 
 1. Install Android Studio(if you don't have it allready), here is a guide for this: https://developer.android.com/studio/install
 2. Install the Flutter and Dart plugins( if you don't have them allready), here is a guide for this: https://docs.flutter.dev/get-started/editor?tab=androidstudio
-3. Clone this repository, check these links if you have trouble doing this step: https://www.geeksforgeeks.org/how-to-clone-android-project-from-github-in-android-studio/
+3. Clone this repository, check these links if you have trouble doing this step: https://www.geeksforgeeks.org/how-to-clone-android-project-from-github-in-android-studio/ ; 
 https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
+4. Open the project in Android Studio, then run `flutter pub get` in terminal to get all the dependencies from the pubspec.yaml
+
+### Running the Project in Android Studio emulator with Virtual Device 
+   
+1. If you want to run the project in the Android Studio emulator, open the Device Manager and create a new virtual device if you don't have one, by clicking `Create Device`
+2. Launch the device AVD in the emulator
+3. Select the created device from the dropdown list Flutter Device Selection , usually appears with `<no device selected>` if you don't have the device selected
+4. Make sure you have selected `main.dart` from the Edit Run/Debug configuration dialog
+5. Run `flutter run --no-sound-null-safety` in Terminal and you're done 
    
 
 
