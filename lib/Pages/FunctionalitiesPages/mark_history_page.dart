@@ -20,14 +20,14 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
   @override
   void initState() {
     super.initState();
-    fetchMarkers().then((docs) {
+    getMarkers().then((docs) {
       setState(() {
         _markerList = docs;
       });
     });
   }
 
-  Future<List<DocumentSnapshot>> fetchMarkers() async {
+  Future<List<DocumentSnapshot>> getMarkers() async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -35,22 +35,23 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
         .orderBy("timestamp", descending: true)
         .where("marker_uid", isEqualTo: userId.toString())
         .get();
+    
     return snapshot.docs;
   }
 
   Future<void> deleteMarker(String markerId) async {
     DocumentSnapshot? deletedMarker;
-    int deletedMarkerIndex = -1;
+    int deletedIndex = -1;
 
     for (int i = 0; i < _markerList.length; i++) {
       if (_markerList[i].id == markerId) {
         deletedMarker = _markerList[i];
-        deletedMarkerIndex = i;
+        deletedIndex = i;
         break;
       }
     }
 
-    if (deletedMarker == null || deletedMarkerIndex == -1) return;
+    if (deletedMarker == null || deletedIndex == -1) return;
 
     await FirebaseFirestore.instance
         .collection('markers')
@@ -65,12 +66,15 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
           label: 'Undo',
           onPressed: () async {
             await FirebaseFirestore.instance.collection('markers').add({
-              'lat': deletedMarker!['lat'],
+              'address': deletedMarker!['address'],
+              'lat': deletedMarker['lat'],
               'long': deletedMarker['long'],
               'category': deletedMarker['category'],
               'marker_uid': FirebaseAuth.instance.currentUser!.uid,
+              'time': deletedMarker['time'],
+              'timestamp': deletedMarker['timestamp']
             });
-            fetchMarkers().then((docs) {
+            getMarkers().then((docs) {
               setState(() {
                 _markerList = docs;
               });
@@ -81,7 +85,7 @@ class _MarkHistoryPageWidgetState extends State<MarkHistoryPageWidget> {
     );
 
     setState(() {
-      _markerList.removeAt(deletedMarkerIndex);
+      _markerList.removeAt(deletedIndex);
     });
   }
 

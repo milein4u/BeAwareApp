@@ -28,9 +28,9 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   @override
   void dispose() {
+    super.dispose();
     emailAddressController.dispose();
     passwordLoginController.dispose();
-    super.dispose();
   }
 
   Future errorMessage(String message) async {

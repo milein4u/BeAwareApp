@@ -80,10 +80,9 @@ class _ForgottenPasswordWidgetState extends State<ForgottenPasswordWidget> {
   }
 
   String hashPassword(String password) {
-    List<int> bytes = utf8.encode(password); // Convert the password to bytes
-    Digest sha256Result = sha256.convert(bytes); // Hash the bytes using SHA-256
-    String hashedPassword =
-        sha256Result.toString(); // Convert the hashed result to a string
+    List<int> bytes = utf8.encode(password);
+    Digest hashResult = sha256.convert(bytes);
+    String hashedPassword = hashResult.toString();
     return hashedPassword;
   }
 

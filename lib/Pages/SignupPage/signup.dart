@@ -22,7 +22,7 @@ class _SignupWidgetState extends State<SignupWidget> {
   late bool confirmPasswordVisibility;
   late bool passwordVisibility;
   late User currentUser;
-  bool isloading = false;
+  bool isLoading = false;
 
 
   @override
@@ -35,11 +35,11 @@ class _SignupWidgetState extends State<SignupWidget> {
 
   @override
   void dispose() {
+    super.dispose();
     confirmPasswordController?.dispose();
     emailAddressController.dispose();
     phoneController.dispose();
     passwordController.dispose();
-    super.dispose();
   }
 
   void getCurrentUser() async {
@@ -109,7 +109,7 @@ class _SignupWidgetState extends State<SignupWidget> {
         Navigator.pushReplacementNamed(context, 'start_page');
 
         setState(() {
-          isloading = false;
+          isLoading = false;
         });
       } on FirebaseAuthException catch (e) {
         if (kDebugMode) {
@@ -146,9 +146,9 @@ class _SignupWidgetState extends State<SignupWidget> {
   }
 
   bool isValidPhoneNumber(String phone) {
-    String pattern = r'^(?:\+40|0)[ ]?7\d{2}[ ]?\d{3}[ ]?\d{3}$';
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(phone);
+    return RegExp(
+        r'^((?:\+40|0)[ ]?7\d{2}[ ]?\d{3}[ ]?\d{3})$')
+        .hasMatch(phone);
   }
 
   bool phoneConfirmed() {
@@ -165,10 +165,9 @@ class _SignupWidgetState extends State<SignupWidget> {
   }
 
   String hashPassword(String password) {
-    List<int> bytes = utf8.encode(password); // Convert the password to bytes
-    Digest sha256Result = sha256.convert(bytes); // Hash the bytes using SHA-256
-    String hashedPassword =
-        sha256Result.toString(); // Convert the hashed result to a string
+    List<int> bytes = utf8.encode(password);
+    Digest hashResult = sha256.convert(bytes);
+    String hashedPassword = hashResult.toString();
     return hashedPassword;
   }
 

@@ -5,9 +5,9 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:location/location.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:location/location.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -38,14 +38,14 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
   String message = '';
   String address = "";
   String dateTime = "";
-  String key = "AIzaSyAY8euc6uR3PwJ-UdfIv7R1rINBiXsiT4Y";
+  String key = " "; // Your API Key here
 
   @override
   void initState() {
     super.initState();
     logoutTimer = Timer(Duration.zero, handleLogout);
     logoutTimerStart();
-    fetchMarkersFromFirestore();
+    getMarkersFromFirestore();
     getLoc();
     DefaultAssetBundle.of(context)
         .loadString('assets/maptheme/silver.json')
@@ -95,7 +95,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     });
   }
 
-  Future<void> fetchMarkersFromFirestore() async {
+  Future<void> getMarkersFromFirestore() async {
     final markersSnapshot =
     await FirebaseFirestore.instance.collection('markers').get();
 
@@ -145,13 +145,12 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     }
   }
 
-  Future<String> convertToAddress(
-      double lat, double long, String apikey) async {
+  Future<String> convertToAddress(double lat, double long, String apikey) async {
     Dio dio = Dio();
     String apiref =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$apikey";
 
-    Response response = await dio.get(apiref); //send get request to API URL
+    Response response = await dio.get(apiref);
 
     if (response.statusCode == 200) {
       Map data = response.data;
@@ -167,7 +166,7 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
       }
     } else {
       if (kDebugMode) {
-        print("error while fetching geoconding data");
+        print("error while geting geoconding data");
       }
     }
 
@@ -193,9 +192,9 @@ class _MapHomePageWidgetState extends State<MapHomePageWidget> {
     return contacts;
   }
 
-  Future<void> _sendSMS(String message, List<String> recipents) async {
-    recipents = await getRecipients();
-    await sendSMS(message: message, recipients: recipents);
+  Future<void> _sendSMS(String message, List<String> recipients) async {
+    recipients = await getRecipients();
+    await sendSMS(message: message, recipients: recipients);
   }
 
   Future logoutTimerStart() async {

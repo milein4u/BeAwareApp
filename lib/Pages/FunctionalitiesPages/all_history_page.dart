@@ -19,14 +19,14 @@ class _AllHistoryPageWidgetState extends State<AllHistoryPageWidget> {
   @override
   void initState() {
     super.initState();
-    fetchMarkers().then((docs) {
+    getMarkers().then((docs) {
       setState(() {
         _markerList = docs;
       });
     });
   }
 
-  Future<List<DocumentSnapshot>> fetchMarkers() async {
+  Future<List<DocumentSnapshot>> getMarkers() async {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('markers')
         .orderBy("timestamp", descending: true)

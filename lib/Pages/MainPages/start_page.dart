@@ -27,10 +27,10 @@ class _StartPageWidgetState extends State<StartPageWidget> {
               Align(
                 alignment: Alignment.center,
                 child: Column(
-                  children: <Widget>[
+                  children: const <Widget>[
                     AnimationEffect(
                         1,
-                        const Text(
+                        Text(
                           "Stay safe,",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -41,7 +41,7 @@ class _StartPageWidgetState extends State<StartPageWidget> {
                         )),
                     AnimationEffect(
                         1,
-                        const Text(
+                        Text(
                           "with BeAware.",
                           style: TextStyle(
                             color: Colors.grey,
@@ -50,12 +50,12 @@ class _StartPageWidgetState extends State<StartPageWidget> {
                             fontFamily: "Poppins",
                           ),
                         )),
-                    const SizedBox(height: 20)
+                    SizedBox(height: 20)
                   ],
                 ),
               ),
               AnimationEffect(
-                  1.4,
+                  1.5,
                   Container(
                     height: MediaQuery.of(context).size.height / 3,
                     decoration: const BoxDecoration(

@@ -27,7 +27,7 @@ class _EmergencyContactsPageWidgetState
   @override
   void initState() {
     super.initState();
-    fetchItems().then((docs) {
+    getItems().then((docs) {
       setState(() {
         items = docs;
       });
@@ -36,14 +36,9 @@ class _EmergencyContactsPageWidgetState
 
   @override
   void dispose() {
+    super.dispose();
     nameController.dispose();
     phoneController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   void sortItems() {
@@ -57,7 +52,7 @@ class _EmergencyContactsPageWidgetState
     });
   }
 
-  Future<List<DocumentSnapshot>> fetchItems() async {
+  Future<List<DocumentSnapshot>> getItems() async {
     final QuerySnapshot snapshot = await collectionRef
         .orderBy("created", descending: true)
         .get();
@@ -127,8 +122,8 @@ class _EmergencyContactsPageWidgetState
                       phoneController.text = '';
                       Navigator.of(context).pop();
                     } else {
-                      errorMessage("Incorect number format");
-                    }fetchItems().then((docs) {
+                      errorMessage("Incorrect number format");
+                    }getItems().then((docs) {
                       setState(() {
                         items = docs;
                       });
@@ -211,7 +206,7 @@ class _EmergencyContactsPageWidgetState
                     } else {
                       errorMessage("Incorect number format");
                     }
-                    fetchItems().then((docs) {
+                    getItems().then((docs) {
                       setState(() {
                         items = docs;
                       });
@@ -254,7 +249,7 @@ class _EmergencyContactsPageWidgetState
               'created': deletedContact['created']
 
             });
-            fetchItems().then((docs) {
+            getItems().then((docs) {
               setState(() {
                 items = docs;
               });
@@ -293,9 +288,9 @@ class _EmergencyContactsPageWidgetState
   }
 
   bool isValidPhoneNumber(String phone) {
-    String pattern = r'^(?:\+40|0)[ ]?7\d{2}[ ]?\d{3}[ ]?\d{3}$';
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(phone);
+    return RegExp(
+        r'^((?:\+40|0)[ ]?7\d{2}[ ]?\d{3}[ ]?\d{3})$')
+        .hasMatch(phone);
   }
 
   bool phoneConfirmed() {
